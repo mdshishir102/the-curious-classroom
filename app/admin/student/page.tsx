@@ -199,50 +199,54 @@ loadStudents();
 
 
 
-
-
-
-
-async function resetPassword(
-student:any
-){
-
+async function resetPassword(student:any){
 
 
 const newPassword =
-"123456";
+Math.random()
+.toString(36)
+.substring(2,10)
+.toUpperCase();
 
 
 
+const response = await fetch(
+"/api/reset-student-password",
+{
 
+method:"POST",
 
-const {error}=await supabase
+headers:{
+"Content-Type":"application/json"
+},
 
-.from("students")
+body:JSON.stringify({
 
-.update({
+userId:student.auth_user_id,
+
+studentDbId:student.id,
 
 password:newPassword
 
 })
 
-.eq(
-"id",
-student.id
+}
+
 );
 
 
 
+const result = await response.json();
 
 
-if(error){
 
-alert(error.message);
+if(result.error){
+
+alert(result.error);
 
 return;
 
 }
-
 
 
 
@@ -251,8 +255,11 @@ alert(
 );
 
 
-
 }
+
+
+
+
 
 
 

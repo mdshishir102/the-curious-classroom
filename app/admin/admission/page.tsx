@@ -317,8 +317,10 @@ export default function AdmissionPage() {
 
 
       const password =
-
-      "123456";
+Math.random()
+.toString(36)
+.substring(2,10)
+.toUpperCase();
 
 
 
