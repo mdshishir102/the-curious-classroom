@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 
 export default function AdmissionForm(){
-
 
 const [loading,setLoading]=useState(false);
 
@@ -14,9 +14,6 @@ const [photoPreview,setPhotoPreview]=useState("");
 const [photo,setPhoto]=useState<File|null>(null);
 
 const [submitted,setSubmitted]=useState(false);
-
-
-
 
 
 const [form,setForm]=useState({
@@ -49,16 +46,12 @@ college:""
 
 
 
-
-
-
-
-
-
 function handleChange(e:any){
 
-
-const {name,value}=e.target;
+const {
+name,
+value
+}=e.target;
 
 
 
@@ -67,9 +60,7 @@ if(name==="class"){
 
 let batch="";
 
-
-const currentYear=new Date().getFullYear();
-
+const year=new Date().getFullYear();
 
 
 
@@ -78,28 +69,19 @@ value==="Class 9" ||
 value==="Class 10"
 ){
 
-
 const sscYear =
-
 value==="Class 9"
-
 ?
-
-currentYear+2
-
+year+2
 :
-
-currentYear+1;
-
+year+1;
 
 
-batch=`SSC ${String(sscYear).slice(-2)}`;
+batch=
+`SSC ${String(sscYear).slice(-2)}`;
 
 
 }
-
-
-
 
 
 
@@ -110,24 +92,17 @@ value==="Class 12"
 
 
 const hscYear =
-
 value==="Class 11"
-
 ?
-
-currentYear+2
-
+year+2
 :
-
-currentYear+1;
-
+year+1;
 
 
-batch=`HSC ${String(hscYear).slice(-2)}`;
-
+batch=
+`HSC ${String(hscYear).slice(-2)}`;
 
 }
-
 
 
 
@@ -144,7 +119,9 @@ batch
 
 return;
 
+
 }
+
 
 
 
@@ -157,11 +134,7 @@ setForm(prev=>({
 }));
 
 
-
 }
-
-
-
 
 
 
@@ -182,55 +155,38 @@ throw new Error(
 
 
 const fileName =
-
 `${Date.now()}-${photo.name}`;
 
 
 
-
-
-
-const {error}=await supabase
-
-.storage
-
+const {
+error
+}
+=
+await supabase.storage
 .from("student-photos")
-
 .upload(
-
 fileName,
-
 photo
-
 );
 
 
 
-
-
 if(error)
-
 throw error;
 
 
 
 
-
-
-const {data}=
-
-supabase
-
-.storage
-
+const {
+data
+}
+=
+supabase.storage
 .from("student-photos")
-
 .getPublicUrl(
-
 fileName
-
 );
-
 
 
 
@@ -245,13 +201,10 @@ return data.publicUrl;
 
 
 
-
-
 async function submitAdmission(e:any){
 
 
 e.preventDefault();
-
 
 
 try{
@@ -261,187 +214,129 @@ setLoading(true);
 
 
 
-
-
-
-// Duplicate Check
-
-
-const {data:existingStudent,error:checkError}=await supabase
-
+const {
+data:existing
+}
+=
+await supabase
 .from("students")
-
-.select(
-
-"id,student_name,whatsapp"
-
+.select("id")
+.eq(
+"whatsapp",
+form.whatsapp
 )
-
-.or(
-
-`whatsapp.eq.${form.whatsapp},and(student_name.eq.${form.student_name},whatsapp.eq.${form.whatsapp})`
-
-)
-
 .maybeSingle();
 
 
 
-
-
-
-if(checkError){
-
-throw checkError;
-
-}
-
-
-
-
-
-
-if(existingStudent){
-
+if(existing){
 
 alert(
-
-"এই শিক্ষার্থীর তথ্য দিয়ে ইতিমধ্যে আবেদন করা হয়েছে।"
-
+"এই WhatsApp নম্বর দিয়ে ইতিমধ্যে আবেদন করা হয়েছে।"
 );
-
 
 return;
 
-
 }
 
 
 
 
-
-
-
-// Upload Photo
-
-
-const photoURL=
-
+const photoURL =
 await uploadPhoto();
 
 
 
 
-
-
-
-const admissionDate=
-
+const today =
 new Date()
-
 .toISOString()
-
 .split("T")[0];
 
 
 
-
-
-
-
-const {error}=await supabase
-
+const {
+error
+}
+=
+await supabase
 .from("students")
-
 .insert({
 
-
-student_id:null,
-
-
-student_name:form.student_name,
+student_name:
+form.student_name,
 
 
-student_photo:photoURL,
+student_photo:
+photoURL,
 
 
-status:"pending",
+guardian_name:
+form.guardian_name,
 
 
-guardian_name:form.guardian_name,
+whatsapp:
+form.whatsapp,
 
 
-whatsapp:form.whatsapp,
+email:
+form.email,
 
 
-facebook_link:form.facebook_link,
+facebook_link:
+form.facebook_link,
 
 
-email:form.email,
+date_of_birth:
+form.date_of_birth,
 
 
-admission_date:admissionDate,
+class:
+form.class,
 
 
-date_of_birth:form.date_of_birth,
+batch:
+form.batch,
 
 
-class:form.class,
+school:
+form.school,
 
 
-batch:form.batch,
+college:
+form.college,
 
 
-present_address:form.present_address,
+present_address:
+form.present_address,
 
 
-permanent_address:form.permanent_address,
+permanent_address:
+form.permanent_address,
 
 
-school:form.school,
+status:
+"pending",
 
 
-college:form.college
+payment_status:
+"pending",
 
+
+payment_method:
+"offline",
+
+
+admission_date:
+today
 
 
 });
 
 
 
-
-
-
-
-if(error){
-
-
-
-if(error.code==="23505"){
-
-
-alert(
-
-"এই WhatsApp নম্বর দিয়ে ইতিমধ্যে আবেদন করা হয়েছে।"
-
-);
-
-
-return;
-
-
-}
-
-
-
+if(error)
 throw error;
-
-
-}
-
-
-
-
 
 
 
@@ -449,47 +344,34 @@ setSubmitted(true);
 
 
 
-alert(
-
-"Admission Submitted Successfully"
-
-);
-
-
-
 }
 
+catch(err:any){
 
-
-
-catch(error:any){
-
-
-alert(error.message);
-
+alert(err.message);
 
 }
-
-
-
 
 finally{
 
-
 setLoading(false);
 
+}
+
 
 }
 
 
 
-}
 
-return(
+
+return (
 
 <div className="
 min-h-screen
-bg-gray-50
+bg-gradient-to-br
+from-blue-50
+to-white
 px-5
 py-10
 ">
@@ -500,74 +382,157 @@ mx-auto
 max-w-4xl
 rounded-3xl
 bg-white
-p-8
+p-6
 shadow-xl
+md:p-10
 ">
+
+
+
+{/* Banner */}
 
 
 <div className="
-mb-8
+mb-10
+rounded-3xl
+bg-gradient-to-br
+from-blue-700
+via-blue-600
+to-cyan-500
+p-8
 text-center
+text-white
 ">
+
+
+<Image
+
+src="/logo.png"
+
+width={150}
+
+height={150}
+
+alt="The Curious Classroom"
+
+className="
+mx-auto
+rounded-2xl
+bg-white
+p-3
+"
+
+/>
+
 
 
 <h1 className="
-text-3xl
+mt-5
+text-4xl
 font-bold
-text-gray-900
 ">
 
-The Curious Classroom
+ভর্তি আবেদন
 
 </h1>
 
 
+
 <p className="
-mt-2
-text-gray-600
+mt-3
+text-blue-100
 ">
 
-ভর্তি আবেদন ফরম
+The Curious Classroom এর সাথে
+<br/>
+আপনার শিক্ষার নতুন যাত্রা শুরু করুন
 
 </p>
+
+
+
+<div className="
+mt-6
+flex
+flex-wrap
+justify-center
+gap-3
+">
+
+
+<span className="
+rounded-full
+bg-white/20
+px-4
+py-2
+">
+
+✓ Online Learning
+
+</span>
+
+
+<span className="
+rounded-full
+bg-white/20
+px-4
+py-2
+">
+
+✓ Regular Exam
+
+</span>
+
+
+<span className="
+rounded-full
+bg-white/20
+px-4
+py-2
+">
+
+✓ Student Dashboard
+
+</span>
+
 
 
 </div>
 
 
+</div>
 
-
+{/* FORM START */}
 
 <form
-
 onSubmit={submitAdmission}
-
 className="
-space-y-6
+space-y-8
 "
-
 >
-
-
-
 
 
 {/* Student Information */}
 
-<div>
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
 
 
 <h2 className="
-mb-4
+mb-5
 text-xl
 font-bold
-text-blue-600
+text-blue-700
 ">
 
-শিক্ষার্থীর তথ্য
+🎓 শিক্ষার্থীর তথ্য
 
 </h2>
-
 
 
 
@@ -584,23 +549,23 @@ onChange={handleChange}
 placeholder="শিক্ষার্থীর নাম"
 
 className="
-mb-3
+mb-4
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
+outline-none
+focus:border-blue-500
 "
 
 />
 
 
 
-
-
-
 <label className="
 mb-2
 block
+font-medium
 text-gray-700
 ">
 
@@ -621,7 +586,8 @@ accept="image/*"
 onChange={(e)=>{
 
 
-const file=e.target.files?.[0];
+const file =
+e.target.files?.[0];
 
 
 if(file){
@@ -639,7 +605,7 @@ URL.createObjectURL(file)
 
 className="
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
@@ -648,12 +614,16 @@ p-3
 
 
 
-
-
-
 {
 
 photoPreview &&
+
+<div className="
+mt-4
+flex
+justify-center
+">
+
 
 <img
 
@@ -662,33 +632,33 @@ src={photoPreview}
 alt="preview"
 
 className="
-mt-4
 h-32
 w-32
-rounded-xl
+rounded-2xl
 object-cover
+shadow
 "
 
 />
+
+
+</div>
 
 }
 
 
 
-
-
-
 <label className="
-mt-4
+mt-5
 mb-2
 block
+font-medium
 text-gray-700
 ">
 
-জন্ম তারিখ *
+জন্ম তারিখ
 
 </label>
-
 
 
 
@@ -706,12 +676,13 @@ onChange={handleChange}
 
 className="
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
 
 />
+
 
 
 </div>
@@ -721,25 +692,28 @@ p-3
 
 
 
-
-
 {/* Guardian Information */}
 
-<div>
+
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
 
 
 <h2 className="
-mb-4
+mb-5
 text-xl
 font-bold
-text-blue-600
+text-blue-700
 ">
 
-অভিভাবকের তথ্য
+👨‍👩‍👦 অভিভাবকের তথ্য
 
 </h2>
-
-
 
 
 
@@ -756,28 +730,15 @@ onChange={handleChange}
 placeholder="অভিভাবকের নাম"
 
 className="
-mb-3
+mb-4
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
 
 />
 
-
-
-
-
-<label className="
-mb-2
-block
-text-gray-700
-">
-
-WhatsApp নম্বর *
-
-</label>
 
 
 
@@ -793,11 +754,11 @@ value={form.whatsapp}
 
 onChange={handleChange}
 
-placeholder="WhatsApp নম্বর (যেমন: 017XXXXXXXX)"
+placeholder="WhatsApp নম্বর"
 
 className="
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
@@ -816,20 +777,26 @@ p-3
 
 {/* Contact Information */}
 
-<div>
+
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
 
 
 <h2 className="
-mb-4
+mb-5
 text-xl
 font-bold
-text-blue-600
+text-blue-700
 ">
 
-যোগাযোগের তথ্য
+📞 যোগাযোগের তথ্য
 
 </h2>
-
 
 
 
@@ -842,18 +809,17 @@ value={form.email}
 
 onChange={handleChange}
 
-placeholder="ই-মেইল"
+placeholder="Email Address"
 
 className="
-mb-3
+mb-4
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
 
 />
-
 
 
 
@@ -870,7 +836,7 @@ placeholder="Facebook Profile Link"
 
 className="
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
@@ -880,23 +846,35 @@ p-3
 
 </div>
 
+
+
+
+
+
+
 {/* Academic Information */}
 
-<div>
+
+
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
 
 
 <h2 className="
-mb-4
+mb-5
 text-xl
 font-bold
-text-blue-600
+text-blue-700
 ">
 
-শিক্ষাগত তথ্য
+📚 শিক্ষাগত তথ্য
 
 </h2>
-
-
 
 
 
@@ -911,9 +889,9 @@ value={form.class}
 onChange={handleChange}
 
 className="
-mb-3
+mb-4
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
@@ -929,38 +907,26 @@ p-3
 
 
 <option>
-
 Class 9
-
 </option>
 
 
 <option>
-
 Class 10
-
 </option>
 
 
 <option>
-
 Class 11
-
 </option>
 
 
 <option>
-
 Class 12
-
 </option>
-
 
 
 </select>
-
-
-
 
 
 
@@ -971,21 +937,17 @@ Class 12
 form.batch &&
 
 <div className="
-rounded-lg
+mb-4
+rounded-xl
 bg-blue-50
-p-3
+p-4
 text-blue-700
 ">
 
-
-ব্যাচ:
+আপনার ব্যাচ:
 
 <b>
-
-{" "}
-
 {form.batch}
-
 </b>
 
 
@@ -993,9 +955,6 @@ text-blue-700
 
 
 }
-
-
-
 
 
 
@@ -1008,19 +967,17 @@ value={form.school}
 
 onChange={handleChange}
 
-placeholder="পূর্ববর্তী স্কুলের নাম"
+placeholder="স্কুলের নাম"
 
 className="
-mt-3
+mb-4
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
 
 />
-
-
 
 
 
@@ -1034,12 +991,11 @@ value={form.college}
 
 onChange={handleChange}
 
-placeholder="পূর্ববর্তী কলেজের নাম"
+placeholder="কলেজের নাম"
 
 className="
-mt-3
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
 "
@@ -1050,32 +1006,28 @@ p-3
 
 </div>
 
-
-
-
-
-
-
-
-
 {/* Address Information */}
 
 
-<div>
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
 
 
 <h2 className="
-mb-4
+mb-5
 text-xl
 font-bold
-text-blue-600
+text-blue-700
 ">
 
-ঠিকানার তথ্য
+🏠 ঠিকানার তথ্য
 
 </h2>
-
-
 
 
 
@@ -1093,17 +1045,17 @@ onChange={handleChange}
 placeholder="বর্তমান ঠিকানা"
 
 className="
-mb-3
-h-28
+mb-4
+h-32
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
+outline-none
+focus:border-blue-500
 "
 
 />
-
-
 
 
 
@@ -1123,11 +1075,13 @@ onChange={handleChange}
 placeholder="স্থায়ী ঠিকানা"
 
 className="
-h-28
+h-32
 w-full
-rounded-lg
+rounded-xl
 border
 p-3
+outline-none
+focus:border-blue-500
 "
 
 />
@@ -1135,8 +1089,6 @@ p-3
 
 
 </div>
-
-
 
 
 
@@ -1154,13 +1106,18 @@ disabled={loading}
 
 className="
 w-full
-rounded-xl
-bg-blue-600
+rounded-2xl
+bg-gradient-to-r
+from-blue-600
+to-cyan-500
 py-4
+text-lg
 font-bold
 text-white
-hover:bg-blue-700
-disabled:bg-gray-400
+shadow-lg
+transition
+hover:scale-[1.02]
+disabled:opacity-50
 "
 
 >
@@ -1172,7 +1129,7 @@ loading
 
 ?
 
-"জমা হচ্ছে..."
+"আবেদন জমা হচ্ছে..."
 
 :
 
@@ -1181,11 +1138,7 @@ loading
 }
 
 
-
 </button>
-
-
-
 
 
 
@@ -1197,31 +1150,30 @@ loading
 
 
 
-
 {
 
 submitted &&
 
-
 <div className="
 mt-8
-rounded-xl
+rounded-2xl
 bg-green-50
-p-5
+p-6
 text-center
+border
+border-green-200
 ">
 
 
 <h3 className="
-text-xl
+text-2xl
 font-bold
 text-green-700
 ">
 
-আবেদন সফলভাবে জমা হয়েছে
+🎉 আবেদন সফল হয়েছে
 
 </h3>
-
 
 
 
@@ -1230,14 +1182,21 @@ mt-3
 text-gray-700
 ">
 
+আপনার আবেদনটি গ্রহণ করা হয়েছে।
+
+<br/>
+
 Admin approval এর পরে
 
-<br />
+<br/>
 
-Student ID এবং Login details প্রদান করা হবে।
+Student ID এবং Login details
+
+<br/>
+
+WhatsApp নম্বরে পাঠানো হবে।
 
 </p>
-
 
 
 </div>
@@ -1249,11 +1208,9 @@ Student ID এবং Login details প্রদান করা হবে।
 
 </div>
 
-
 </div>
 
 
 );
-
 
 }
