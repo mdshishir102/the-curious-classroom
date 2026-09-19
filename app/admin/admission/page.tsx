@@ -88,7 +88,43 @@ loadStudents();
 
 
 
+async function markAsPaid(id:number){
 
+
+const {error}=await supabase
+
+.from("students")
+
+.update({
+
+payment_status:"paid"
+
+})
+
+.eq(
+"id",
+id
+);
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+
+alert("Payment marked as paid");
+
+
+loadStudents();
+
+
+}
 
 
 
@@ -188,7 +224,21 @@ return;
 if(status==="approved"){
 
 
+    if(student.payment_status !== "paid"){
 
+alert("আগে Payment Clear করুন");
+
+return;
+
+}
+
+if(student.payment_status !== "paid"){
+
+alert("Payment not completed");
+
+return;
+
+}
 
 
 const prefix =
@@ -746,6 +796,21 @@ WhatsApp: {student.whatsapp}
 </p>
 
 
+<p>
+Payment Method:
+<b>
+{student.payment_method}
+</b>
+</p>
+
+
+<p>
+Payment Status:
+<b>
+{student.payment_status}
+</b>
+</p>
+
 
 <p>
 
@@ -777,6 +842,25 @@ flex
 gap-4
 ">
 
+
+
+<button
+
+onClick={()=>markAsPaid(student.id)}
+
+className="
+rounded-lg
+bg-yellow-500
+px-5
+py-2
+text-white
+"
+
+>
+
+Mark as Paid
+
+</button>
 
 
 

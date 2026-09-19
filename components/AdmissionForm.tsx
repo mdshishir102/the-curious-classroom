@@ -40,9 +40,17 @@ permanent_address:"",
 
 school:"",
 
-college:""
+college:"",
+
+payment_method:"",
+
+bkash_number:"",
+
+transaction_id:""
 
 });
+
+
 
 
 
@@ -331,7 +339,15 @@ payment_status:
 
 
 payment_method:
-"offline",
+form.payment_method,
+
+
+bkash_number:
+form.bkash_number,
+
+
+transaction_id:
+form.transaction_id,
 
 
 admission_date:
@@ -1092,6 +1108,163 @@ p-3
 "
 
 />
+
+
+{/* Payment Information */}
+
+<div className="
+rounded-2xl
+border
+bg-white
+p-6
+shadow-sm
+">
+
+
+<h2 className="
+mb-5
+text-xl
+font-bold
+text-blue-700
+">
+
+💳 পেমেন্ট তথ্য
+
+</h2>
+
+
+
+
+<select
+
+required
+
+name="payment_method"
+
+value={form.payment_method}
+
+onChange={handleChange}
+
+className="
+mb-4
+w-full
+rounded-xl
+border
+p-3
+"
+
+>
+
+<option value="">
+
+পেমেন্ট মাধ্যম নির্বাচন করুন
+
+</option>
+
+
+<option value="offline">
+
+Offline Payment
+
+</option>
+
+
+<option value="bkash">
+
+bKash Payment
+
+</option>
+
+
+</select>
+
+
+
+
+
+{
+
+form.payment_method==="bkash" &&
+
+<>
+
+<input
+
+required
+
+name="bkash_number"
+
+value={form.bkash_number}
+
+onChange={handleChange}
+
+placeholder="bKash Number"
+
+className="
+mb-4
+w-full
+rounded-xl
+border
+p-3
+"
+
+/>
+
+
+
+
+<input
+
+required
+
+name="transaction_id"
+
+value={form.transaction_id}
+
+onChange={handleChange}
+
+placeholder="bKash Transaction ID"
+
+className="
+w-full
+rounded-xl
+border
+p-3
+"
+
+/>
+
+
+</>
+
+
+}
+
+
+
+
+{
+
+form.payment_method==="offline" &&
+
+<div className="
+rounded-xl
+bg-yellow-50
+p-4
+text-yellow-700
+">
+
+অফলাইন পেমেন্ট নির্বাচিত হয়েছে।
+পেমেন্ট সম্পন্ন করার পর আবেদন যাচাই করা হবে।
+
+</div>
+
+}
+
+
+
+</div>
+
 
 
 </div>
