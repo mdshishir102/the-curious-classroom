@@ -23,10 +23,7 @@ const [loading,setLoading] = useState(false);
 
 
 
-
-
 async function login(){
-
 
 
 if(!studentID || !password){
@@ -39,7 +36,6 @@ return;
 
 
 
-
 try{
 
 
@@ -48,37 +44,32 @@ setLoading(true);
 
 
 
-// Create internal email
+// Check student from database
 
-const email =
+const {data:studentData,error}=await supabase
 
-`${studentID.trim().toLowerCase()}@student.tcc.com`;
+.from("students")
 
+.select("*")
 
+.eq(
+"student_id",
+studentID.trim()
+)
 
+.eq(
+"password",
+password.trim()
+)
 
-
-
-// Supabase Auth Login
-
-
-const {data:authData,error:authError}=
-
-await supabase.auth.signInWithPassword({
-
-email:email,
-
-password:password.trim()
-
-});
+.single();
 
 
 
 
 
 
-
-if(authError || !authData.user){
+if(error || !studentData){
 
 
 alert(
@@ -90,50 +81,6 @@ return;
 
 
 }
-
-
-
-
-
-
-
-// Load Student Profile
-
-
-const {data:studentData,error:studentError}=
-
-await supabase
-
-.from("students")
-
-.select("*")
-
-.eq(
-"auth_user_id",
-authData.user.id
-)
-
-.single();
-
-
-
-
-
-
-
-if(studentError || !studentData){
-
-
-alert(
-"Student profile not found"
-);
-
-
-return;
-
-
-}
-
 
 
 
@@ -159,8 +106,7 @@ return;
 
 
 
-
-// Save student session
+// Save login session
 
 
 localStorage.setItem(
@@ -177,6 +123,9 @@ JSON.stringify(studentData)
 
 
 
+// Go student dashboard
+
+
 router.push(
 
 "/student/dashboard"
@@ -189,7 +138,12 @@ router.push(
 
 }
 
+
+
 catch(error){
+
+
+console.log(error);
 
 
 alert(
@@ -198,6 +152,8 @@ alert(
 
 
 }
+
+
 
 finally{
 
@@ -210,6 +166,8 @@ setLoading(false);
 
 
 }
+
+
 
 
 
@@ -292,7 +250,9 @@ value={studentID}
 
 
 onChange={
+
 e=>setStudentID(e.target.value)
+
 }
 
 
@@ -327,7 +287,9 @@ value={password}
 
 
 onChange={
+
 e=>setPassword(e.target.value)
+
 }
 
 
@@ -362,7 +324,6 @@ disabled:bg-gray-400
 >
 
 
-
 {
 
 loading
@@ -376,7 +337,6 @@ loading
 "Login"
 
 }
-
 
 
 </button>
