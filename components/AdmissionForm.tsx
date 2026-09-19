@@ -385,7 +385,125 @@ setLoading(false);
 }
 
 
+if(submitted){
 
+return(
+
+<div className="
+min-h-screen
+bg-gradient-to-br
+from-blue-50
+to-white
+flex
+items-center
+justify-center
+p-5
+">
+
+
+<div className="
+max-w-lg
+rounded-3xl
+bg-white
+p-8
+text-center
+shadow-xl
+">
+
+
+<div className="
+text-6xl
+">
+🎉
+</div>
+
+
+<h1 className="
+mt-5
+text-3xl
+font-bold
+text-green-600
+">
+
+আবেদন সফল হয়েছে
+
+</h1>
+
+
+<p className="
+mt-5
+text-gray-700
+leading-8
+">
+
+আপনার ভর্তি আবেদনটি সফলভাবে গ্রহণ করা হয়েছে।
+
+<br/><br/>
+
+আমাদের টিম আপনার তথ্য ও পেমেন্ট যাচাই করবে।
+
+<br/><br/>
+
+আবেদন সঠিক হলে আপনার
+
+<br/>
+
+<b>Student ID</b>
+
+এবং
+
+<b>Login Password</b>
+
+<br/>
+
+আপনার দেওয়া WhatsApp নম্বরে পাঠিয়ে দেওয়া হবে।
+
+</p>
+
+
+
+<div className="
+mt-6
+rounded-xl
+bg-blue-50
+p-4
+text-blue-700
+">
+
+📱 WhatsApp নম্বর সক্রিয় রাখুন
+
+</div>
+
+
+
+<button
+
+onClick={()=>window.location.href="/"}
+
+className="
+mt-6
+rounded-xl
+bg-blue-600
+px-8
+py-3
+text-white
+font-bold
+"
+
+>
+
+হোম পেজে যান
+
+</button>
+
+
+</div>
+
+</div>
+
+)
+
+}
 
 
 return (
