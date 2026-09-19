@@ -57,9 +57,9 @@ const {data:studentData,error}=await supabase
 studentID.trim()
 )
 
-.eq(
-"password",
-password.trim()
+.ilike(
+"student_id",
+studentID.trim()
 )
 
 .single();

@@ -1,415 +1,69 @@
 "use client";
 
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import jsPDF from "jspdf";
-
+import {useEffect,useState} from "react";
+import {useRouter} from "next/navigation";
+import {supabase} from "@/lib/supabase";
 
 
 export default function StudentDashboard(){
 
+const router = useRouter();
 
-  const router = useRouter();
 
+const [student,setStudent] = useState<any>(null);
 
+const [notices,setNotices] = useState<any[]>([]);
 
-  const [student,setStudent] = useState<any>(null);
+const [exams,setExams] = useState<any[]>([]);
 
+const [fees,setFees] = useState<any[]>([]);
 
-  const [fees,setFees] = useState<any[]>([]);
+const [results,setResults] = useState<any[]>([]);
 
+const [loading,setLoading] = useState(true);
 
-  const [results,setResults] = useState<any[]>([]);
 
-  const [notices,setNotices] = useState<any[]>([]);
 
-  const [exams,setExams] = useState<any[]>([]);
 
 
+useEffect(()=>{
 
-async function downloadFullReportPDF(){
+const data = localStorage.getItem("student");
 
 
-  const doc = new jsPDF();
+if(!data){
 
+router.push("/student/login");
 
-
-  doc.setFontSize(18);
-
-
-  doc.text(
-    "The Curious Classroom",
-    20,
-    20
-  );
-
-
-
-  doc.setFontSize(14);
-
-
-  doc.text(
-    "Student Full Report Card",
-    20,
-    35
-  );
-
-
-
-  doc.line(
-    20,
-    42,
-    190,
-    42
-  );
-
-
-
-  doc.setFontSize(11);
-
-
-
-  doc.text(
-    `Student Name: ${student.student_name}`,
-    20,
-    60
-  );
-
-
-  doc.text(
-    `Student ID: ${student.student_id}`,
-    20,
-    70
-  );
-
-
-  doc.text(
-    `Class: ${student.class}`,
-    20,
-    80
-  );
-
-
-  doc.text(
-    `Batch: ${student.batch}`,
-    20,
-    90
-  );
-
-
-
-
-  let y = 115;
-
-
-
-  doc.text(
-    "Academic Results",
-    20,
-    y
-  );
-
-
-
-  y += 15;
-
-
-
-  results.forEach((result,index)=>{
-
-
-
-    doc.text(
-
-      `${index+1}. ${result.subject}`,
-
-      20,
-
-      y
-
-    );
-
-
-    y += 8;
-
-
-
-    doc.text(
-
-      `${result.exam_type} ${result.exam_number ? result.exam_number : ""}`,
-
-      30,
-
-      y
-
-    );
-
-
-    y += 8;
-
-
-
-    doc.text(
-
-      `Marks: ${result.marks}/${result.total_marks}   Percentage: ${result.percentage}%   Grade: ${result.grade}`,
-
-      30,
-
-      y
-
-    );
-
-
-
-    y += 15;
-
-
-
-    if(y > 270){
-
-
-      doc.addPage();
-
-
-      y = 20;
-
-
-    }
-
-
-
-  });
-
-
-
-
-
-  doc.line(
-
-    20,
-
-    y,
-
-    190,
-
-    y
-
-  );
-
-
-
-  doc.text(
-
-    "Powered by The Curious Classroom",
-
-    20,
-
-    y + 15
-
-  );
-
-
-
-  doc.save(
-
-    `${student.student_id}_Full_Report_Card.pdf`
-
-  );
-
-
+return;
 
 }
 
-  async function downloadResultPDF(result:any){
 
+const studentData = JSON.parse(data);
 
-    const doc = new jsPDF();
+setStudent(studentData);
 
 
+loadDashboard(studentData.id);
 
-    doc.setFontSize(18);
 
-    doc.text(
-      "The Curious Classroom",
-      20,
-      20
-    );
 
+},[]);
 
 
-    doc.setFontSize(14);
 
-    doc.text(
-      "Student Result Card",
-      20,
-      35
-    );
 
 
 
-    doc.line(
-      20,
-      42,
-      190,
-      42
-    );
+async function loadDashboard(id:number){
 
 
+setLoading(true);
 
-    doc.setFontSize(11);
 
 
-
-    doc.text(
-      `Student Name: ${student.student_name}`,
-      20,
-      60
-    );
-
-
-    doc.text(
-      `Student ID: ${student.student_id}`,
-      20,
-      70
-    );
-
-
-    doc.text(
-      `Class: ${student.class}`,
-      20,
-      80
-    );
-
-
-    doc.text(
-      `Batch: ${student.batch}`,
-      20,
-      90
-    );
-
-
-
-    doc.line(
-      20,
-      100,
-      190,
-      100
-    );
-
-
-
-    doc.text(
-      `Subject: ${result.subject}`,
-      20,
-      120
-    );
-
-
-    doc.text(
-      `Exam Type: ${result.exam_type}`,
-      20,
-      130
-    );
-
-
-
-    if(result.exam_number){
-
-
-      doc.text(
-        `Exam Number: ${result.exam_number}`,
-        20,
-        140
-      );
-
-
-    }
-
-
-
-    doc.text(
-      `Marks: ${result.marks}/${result.total_marks}`,
-      20,
-      155
-    );
-
-
-    doc.text(
-      `Percentage: ${result.percentage}%`,
-      20,
-      165
-    );
-
-
-    doc.text(
-      `Grade: ${result.grade}`,
-      20,
-      175
-    );
-
-
-
-    if(result.comment){
-
-
-      doc.text(
-        "Teacher Comment:",
-        20,
-        195
-      );
-
-
-      doc.text(
-        result.comment,
-        20,
-        205
-      );
-
-
-    }
-
-
-
-    doc.line(
-      20,
-      230,
-      190,
-      230
-    );
-
-
-
-    doc.text(
-      "Powered by The Curious Classroom",
-      20,
-      245
-    );
-
-
-
-    doc.save(
-
-      `${student.student_id}_Result_Card.pdf`
-
-    );
-
-
-  }
-
-
-
-
-
-
-  useEffect(()=>{
-
-
-    async function loadNotices(){
-
-
-const {data,error}=await supabase
+const {data:noticeData}=await supabase
 
 .from("notices")
 
@@ -420,444 +74,624 @@ const {data,error}=await supabase
 {
 ascending:false
 }
-)
 
-.limit(5);
+);
 
 
+setNotices(noticeData || []);
 
-if(!error){
 
-setNotices(data || []);
 
-}
 
 
-}
+const {data:examData}=await supabase
 
-    async function loadStudent(){
-
-
-      const {
-data:{
-session
-}
-
-}=await supabase.auth.getSession();
-
-
-
-if(!session){
-
-router.push("/student/login");
-
-return;
-
-}
-
-const data =
-localStorage.getItem("student");
-
-      if(!data){
-
-
-        router.push("/student/login");
-
-        return;
-
-
-      }
-
-
-
-
-      const studentData =
-      JSON.parse(data);
-
-
-
-      setStudent(studentData);
-loadExams(studentData);
-
-
-
-
-      const {data:feeData,error:feeError}=
-
-      await supabase
-
-      .from("fees")
-
-      .select("*")
-
-      .eq(
-        "student_id",
-        studentData.student_id
-      );
-
-
-
-      if(!feeError){
-
-        setFees(
-          feeData || []
-        );
-
-      }
-
-
-
-
-
-
-      const {data:resultData,error:resultError}=
-
-      await supabase
-
-      .from("results")
-
-      .select("*")
-
-      .eq(
-        "student_id",
-        studentData.student_id
-      )
-
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-
-      if(!resultError){
-
-        setResults(
-          resultData || []
-        );
-
-      }
-
-
-
-    }
-
-
-
-    loadStudent();
-
-loadNotices();
-
-  },[]);
-
-
-
-async function loadExams(studentData:any){
-
-
-const {data,error}=await supabase
-
-.from("exam_schedule")
+.from("exams")
 
 .select("*")
-
-.eq(
-"class",
-studentData.class
-)
-
-.eq(
-"batch",
-studentData.batch
-)
 
 .order(
 "exam_date",
 {
 ascending:true
 }
+
+);
+
+
+setExams(examData || []);
+
+
+
+
+
+
+const {data:feeData}=await supabase
+
+.from("fees")
+
+.select("*")
+
+.eq(
+"student_id",
+id
+);
+
+
+setFees(feeData || []);
+
+
+
+
+
+
+const {data:resultData}=await supabase
+
+.from("results")
+
+.select("*")
+
+.eq(
+"student_id",
+id
+);
+
+
+setResults(resultData || []);
+
+
+
+setLoading(false);
+
+
+}
+
+
+
+
+
+
+function logout(){
+
+localStorage.removeItem("student");
+
+router.push("/student/login");
+
+}
+
+
+
+
+
+
+if(loading){
+
+
+return (
+
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+bg-blue-50
+">
+
+Loading Dashboard...
+
+</div>
+
 )
 
-.limit(5);
-
-
-
-
-
-if(!error){
-
-setExams(data || []);
-
-}
-
-
-
 }
 
 
 
 
-
-
-
-async function logout(){
-
-
-await supabase.auth.signOut();
-
-
-
-localStorage.removeItem(
-"student"
-);
-
-
-
-router.push(
-"/student/login"
-);
-
-
-
-}
-
-
-
-
-
-
-  if(!student){
-
-
-    return(
-
-      <div className="p-10">
-
-        Loading...
-
-      </div>
-
-    );
-
-
-  }
-
-    return (
-
-    <main className="
-    min-h-screen
-    bg-gray-100
-    p-6
-    ">
-
-
-      <div className="
-      mx-auto
-      max-w-5xl
-      ">
-
-
-        <div className="
-        rounded-3xl
-        bg-white
-        p-8
-        shadow-xl
-        ">
-
-
-
-          {/* Header */}
-
-
-          <div className="
-          flex
-          flex-col
-          items-center
-          gap-5
-          md:flex-row
-          ">
-
-
-
-            {
-              student.student_photo ?
-
-
-              <img
-
-              src={student.student_photo}
-
-              alt="Student"
-
-              className="
-              h-32
-              w-32
-              rounded-full
-              object-cover
-              border-4
-              border-blue-100
-              "
-
-              />
-
-
-              :
-
-
-              <div className="
-              flex
-              h-32
-              w-32
-              items-center
-              justify-center
-              rounded-full
-              bg-blue-100
-              text-4xl
-              font-bold
-              text-blue-600
-              ">
-
-                {student.student_name?.charAt(0)}
-
-              </div>
-
-
-            }
-
-
-
-
-            <div>
-
-
-              <h1 className="
-              text-3xl
-              font-bold
-              ">
-
-                {student.student_name}
-
-              </h1>
-
-
-
-              <p className="text-gray-500">
-
-                The Curious Classroom Student Portal
-
-              </p>
-
-
-            </div>
-
-
-          </div>
-
-
-
-
-
-
-
-          <hr className="my-8"/>
-
-
-
-
-
-
-          {/* Student Information */}
-
-
-          <h2 className="
-          text-xl
-          font-bold
-          ">
-
-          Student Information
-
-          </h2>
-
-
-
-
-          <div className="
-          mt-5
-          grid
-          gap-4
-          md:grid-cols-2
-          ">
-
-
-
-          <Info
-
-          title="Student ID"
-
-          value={student.student_id}
-
-          />
-
-
-
-          <Info
-
-          title="Class"
-
-          value={student.class}
-
-          />
-
-
-
-          <Info
-
-          title="Batch"
-
-          value={student.batch}
-
-          />
-
-
-
-          <Info
-
-          title="Phone"
-
-          value={student.whatsapp}
-
-          />
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-          <hr className="my-8"/>
-
-{/* Notice Board */}
+return (
+
+<main className="
+min-h-screen
+bg-gradient-to-br
+from-blue-50
+via-white
+to-indigo-50
+p-5
+">
 
 
 <div className="
+max-w-6xl
+mx-auto
+">
+
+
+{/* HEADER */}
+
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-5
+flex
+items-center
+justify-between
+">
+
+
+<div className="
+flex
+items-center
+gap-4
+">
+
+
+<img
+
+src="/logo.png"
+
+className="
+h-14
+w-auto
+"
+
+/>
+
+
+<div>
+
+<h1 className="
+text-xl
+font-bold
+text-blue-700
+">
+
+The Curious Classroom
+
+</h1>
+
+
+<p className="
+text-gray-500
+text-sm
+">
+
+Student Portal
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+<button
+
+onClick={logout}
+
+className="
+rounded-xl
+bg-red-500
+px-5
+py-2
+text-white
+font-bold
+"
+
+>
+
+Logout
+
+</button>
+
+
+</div>
+
+
+
+{/* PROFILE CARD */}
+
+<div className="
 mt-8
-rounded-2xl
+bg-white
+rounded-3xl
+shadow-xl
+p-8
+">
+
+
+<div className="
+flex
+flex-col
+md:flex-row
+items-center
+gap-8
+">
+
+
+<img
+
+src={
+student?.student_photo ||
+"/logo.png"
+}
+
+className="
+h-32
+w-32
+rounded-full
+object-cover
+border-4
+border-blue-100
+shadow-lg
+"
+
+/>
+
+
+
+<div className="
+text-center
+md:text-left
+">
+
+
+<h2 className="
+text-3xl
+font-bold
+text-gray-800
+">
+
+{student?.student_name}
+
+</h2>
+
+
+<p className="
+mt-2
+text-gray-500
+">
+
+The Curious Classroom Student Portal
+
+</p>
+
+
+
+<div className="
+mt-5
+grid
+grid-cols-2
+md:grid-cols-4
+gap-4
+">
+
+
+<div className="
 bg-blue-50
+rounded-2xl
+p-4
+">
+
+<p className="
+text-sm
+text-gray-500
+">
+
+Student ID
+
+</p>
+
+
+<p className="
+font-bold
+text-blue-700
+">
+
+{student?.student_id}
+
+</p>
+
+
+</div>
+
+
+
+
+<div className="
+bg-green-50
+rounded-2xl
+p-4
+">
+
+<p className="
+text-sm
+text-gray-500
+">
+
+Class
+
+</p>
+
+
+<p className="
+font-bold
+text-green-700
+">
+
+{student?.class}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div className="
+bg-purple-50
+rounded-2xl
+p-4
+">
+
+<p className="
+text-sm
+text-gray-500
+">
+
+Batch
+
+</p>
+
+
+<p className="
+font-bold
+text-purple-700
+">
+
+{student?.batch}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div className="
+bg-orange-50
+rounded-2xl
+p-4
+">
+
+<p className="
+text-sm
+text-gray-500
+">
+
+Phone
+
+</p>
+
+
+<p className="
+font-bold
+text-orange-700
+">
+
+{student?.whatsapp}
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+{/* QUICK ACCESS */}
+
+
+<h2 className="
+mt-10
+mb-5
+text-2xl
+font-bold
+text-gray-800
+">
+
+Quick Access
+
+</h2>
+
+
+
+
+<div className="
+grid
+grid-cols-2
+md:grid-cols-4
+gap-5
+">
+
+
+
+<div className="
+bg-white
+rounded-3xl
+shadow
+p-6
+text-center
+hover:shadow-xl
+transition
+">
+
+<div className="
+text-4xl
+">
+
+📚
+
+</div>
+
+
+<h3 className="
+mt-3
+font-bold
+">
+
+Classes
+
+</h3>
+
+
+</div>
+
+
+
+
+<div className="
+bg-white
+rounded-3xl
+shadow
+p-6
+text-center
+hover:shadow-xl
+transition
+">
+
+<div className="
+text-4xl
+">
+
+📝
+
+</div>
+
+
+<h3 className="
+mt-3
+font-bold
+">
+
+Exam
+
+</h3>
+
+
+</div>
+
+
+
+
+<div className="
+bg-white
+rounded-3xl
+shadow
+p-6
+text-center
+hover:shadow-xl
+transition
+">
+
+<div className="
+text-4xl
+">
+
+📊
+
+</div>
+
+
+<h3 className="
+mt-3
+font-bold
+">
+
+Result
+
+</h3>
+
+
+</div>
+
+
+
+
+<div className="
+bg-white
+rounded-3xl
+shadow
+p-6
+text-center
+hover:shadow-xl
+transition
+">
+
+<div className="
+text-4xl
+">
+
+💳
+
+</div>
+
+
+<h3 className="
+mt-3
+font-bold
+">
+
+Payment
+
+</h3>
+
+
+</div>
+
+
+
+</div>
+
+
+{/* NOTICE BOARD */}
+
+
+<div className="
+mt-10
+bg-white
+rounded-3xl
+shadow-lg
 p-6
 ">
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
-text-blue-800
+text-blue-700
+mb-5
 ">
 
 📢 Notice Board
@@ -866,23 +700,16 @@ text-blue-800
 
 
 
-
-<div className="
-mt-4
-space-y-4
-">
-
-
 {
 
 notices.length===0 ?
 
 
 <p className="
-text-gray-600
+text-gray-500
 ">
 
-No notice available.
+No notice available
 
 </p>
 
@@ -890,7 +717,14 @@ No notice available.
 :
 
 
-notices.map((notice)=>(
+<div className="
+space-y-4
+">
+
+
+{
+
+notices.slice(0,3).map(notice=>(
 
 
 <div
@@ -898,10 +732,9 @@ notices.map((notice)=>(
 key={notice.id}
 
 className="
-rounded-xl
-bg-white
-p-4
-shadow-sm
+rounded-2xl
+bg-blue-50
+p-5
 "
 
 >
@@ -909,12 +742,12 @@ shadow-sm
 
 <h3 className="
 font-bold
+text-lg
 ">
 
 {notice.title}
 
 </h3>
-
 
 
 <p className="
@@ -925,7 +758,6 @@ text-gray-600
 {notice.description}
 
 </p>
-
 
 
 </div>
@@ -941,25 +773,36 @@ text-gray-600
 </div>
 
 
+}
+
+
 
 </div>
 
 
-{/* Upcoming Exam */}
+
+
+
+
+
+{/* EXAM SECTION */}
+
 
 
 <div className="
 mt-8
-rounded-2xl
-bg-purple-50
+bg-white
+rounded-3xl
+shadow-lg
 p-6
 ">
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
-text-purple-800
+text-purple-700
+mb-5
 ">
 
 📅 Upcoming Exam
@@ -969,22 +812,16 @@ text-purple-800
 
 
 
-<div className="
-mt-4
-space-y-4
-">
-
-
 {
 
 exams.length===0 ?
 
 
 <p className="
-text-gray-600
+text-gray-500
 ">
 
-No upcoming exam available.
+No upcoming exam
 
 </p>
 
@@ -992,7 +829,14 @@ No upcoming exam available.
 :
 
 
-exams.map((exam)=>(
+<div className="
+space-y-4
+">
+
+
+{
+
+exams.slice(0,3).map(exam=>(
 
 
 <div
@@ -1000,17 +844,18 @@ exams.map((exam)=>(
 key={exam.id}
 
 className="
-rounded-xl
-bg-white
-p-4
-shadow-sm
+rounded-2xl
+bg-purple-50
+p-5
 "
+
 
 >
 
 
 <h3 className="
 font-bold
+text-lg
 ">
 
 {exam.subject}
@@ -1020,14 +865,13 @@ font-bold
 
 
 <p className="
+mt-2
 text-gray-600
 ">
 
 {exam.exam_type}
 
 </p>
-
-
 
 
 <p className="
@@ -1037,8 +881,6 @@ mt-2
 📅 {exam.exam_date}
 
 </p>
-
-
 
 
 <p>
@@ -1062,34 +904,52 @@ mt-2
 </div>
 
 
+}
+
+
 
 </div>
 
 
 
 
-          {/* Fee Section */}
+
+
+
+
+{/* FEE STATUS */}
+
+
+
+<div className="
+mt-8
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+">
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
+text-green-700
+mb-5
 ">
 
-Monthly Fee Status
+💳 Fee Overview
 
 </h2>
 
 
 
 
-
 <div className="
-mt-5
 grid
-gap-5
 md:grid-cols-2
+gap-5
 ">
+
 
 
 <div className="
@@ -1108,29 +968,36 @@ Total Paid
 </p>
 
 
-<p className="
-mt-2
+<h3 className="
 text-3xl
 font-bold
 text-green-700
+mt-2
 ">
 
-৳ {
+৳
+
+{
+
 fees
+
 .filter(
 fee=>fee.status==="paid"
 )
+
 .reduce(
-(sum,fee)=>sum+Number(fee.amount),
+(sum,fee)=>
+sum+Number(fee.amount),
 0
 )
+
 }
 
-</p>
+
+</h3>
 
 
 </div>
-
 
 
 
@@ -1152,25 +1019,33 @@ Total Due
 </p>
 
 
-<p className="
-mt-2
+<h3 className="
 text-3xl
 font-bold
 text-yellow-700
+mt-2
 ">
 
-৳ {
+৳
+
+{
+
 fees
+
 .filter(
 fee=>fee.status==="due"
 )
+
 .reduce(
-(sum,fee)=>sum+Number(fee.amount),
+(sum,fee)=>
+sum+Number(fee.amount),
 0
 )
+
 }
 
-</p>
+
+</h3>
 
 
 </div>
@@ -1181,51 +1056,79 @@ fee=>fee.status==="due"
 
 
 
+</div>
 
 
+
+
+
+
+
+
+
+{/* RESULT */}
 
 
 
 <div className="
-mt-6
+mt-8
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+">
+
+
+<h2 className="
+text-2xl
+font-bold
+text-indigo-700
+mb-5
+">
+
+🏆 Academic Progress
+
+</h2>
+
+
+
+{
+
+results.length===0 ?
+
+
+<p className="
+text-gray-500
+">
+
+No result available yet
+
+</p>
+
+
+:
+
+
+<div className="
 space-y-4
 ">
 
 
 {
 
-fees.length===0 ?
-
-
-<div className="
-rounded-xl
-bg-gray-50
-p-5
-">
-
-No fee record available.
-
-</div>
-
-
-
-:
-
-
-fees.map((fee)=>(
+results.slice(0,3).map(result=>(
 
 
 <div
 
-key={fee.id}
+key={result.id}
 
 className="
-flex
-items-center
-justify-between
 rounded-2xl
-bg-gray-50
+bg-indigo-50
 p-5
+flex
+justify-between
 "
 
 
@@ -1234,20 +1137,20 @@ p-5
 
 <div>
 
-
-<p className="
+<h3 className="
 font-bold
 ">
 
-{fee.month}
+{result.subject}
 
-</p>
+</h3>
 
 
-<p>
+<p className="
+text-gray-600
+">
 
-Amount:
-৳ {fee.amount}
+{result.exam_type}
 
 </p>
 
@@ -1256,55 +1159,37 @@ Amount:
 
 
 
+<div className="
+text-right
+">
 
 
-<span
+<p className="
+text-2xl
+font-bold
+text-blue-700
+">
 
-className={`
-rounded-full
-px-4
-py-1
-font-semibold
+{result.marks}
 
-${
-fee.status==="paid"
-
-?
-
-"bg-green-100 text-green-700"
-
-:
-
-"bg-yellow-100 text-yellow-700"
-
-}
-
-`}
-
->
+</p>
 
 
-{
-fee.status==="paid"
+<p className="
+font-bold
+text-green-700
+">
 
-?
+{result.grade}
 
-"PAID"
-
-:
-
-"DUE"
-
-}
-
-
-</span>
-
-
+</p>
 
 
 </div>
 
+
+
+</div>
 
 
 ))
@@ -1315,381 +1200,25 @@ fee.status==="paid"
 
 
 </div>
-          {/* Result Section */}
-
-
-          <h2 className="
-          text-xl
-          font-bold
-          ">
-
-          Academic Progress
-
-          </h2>
-
-
-<button
-
-onClick={downloadFullReportPDF}
-
-className="
-mb-5
-rounded-lg
-bg-purple-600
-px-5
-py-3
-text-white
-"
-
->
-
-Download Full Report
-
-</button>
-
-
-          <div className="
-          mt-5
-          space-y-4
-          ">
-
-
-
-          {
-
-          results.length===0 ?
-
-
-          <div className="
-          rounded-xl
-          bg-blue-50
-          p-5
-          text-blue-700
-          ">
-
-          No result available yet.
-
-          </div>
-
-
-
-          :
-
-
-
-          results.map((result)=>(
-
-
-
-          <div
-
-          key={result.id}
-
-          className="
-          rounded-xl
-          bg-gray-50
-          p-5
-          ">
-
-
-
-          <div className="
-          flex
-          justify-between
-          ">
-
-
-
-          <div>
-
-
-          <h3 className="
-          text-lg
-          font-bold
-          ">
-
-          {result.subject}
-
-          </h3>
-
-
-
-          <p className="text-gray-600">
-
-          {result.exam_type}
-
-          {
-            result.exam_number &&
-            ` ${String(result.exam_number).padStart(2,"0")}`
-          }
-
-          </p>
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-          <div className="
-          text-right
-          ">
-
-
-
-          <p className="
-          text-xl
-          font-bold
-          text-blue-600
-          ">
-
-          {result.marks}/{result.total_marks}
-
-          </p>
-
-
-
-
-          <p className="
-          font-bold
-          text-green-600
-          ">
-
-          {result.grade}
-
-          </p>
-
-
-
-
-          <p className="
-          text-sm
-          text-gray-500
-          ">
-
-          {result.percentage}%
-
-          </p>
-
-
-
-
-
-
-          <button
-
-          onClick={()=>
-            downloadResultPDF(result)
-          }
-
-          className="
-          mt-3
-          rounded-lg
-          bg-blue-600
-          px-4
-          py-2
-          text-sm
-          text-white
-          "
-
-          >
-
-          Download PDF
-
-          </button>
-
-
-
-
-          </div>
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-          {
-
-          result.chapter &&
-
-          <p className="
-          mt-3
-          text-sm
-          text-gray-600
-          ">
-
-          Chapter:
-          {result.chapter}
-
-          </p>
-
-          }
-
-
-
-
-
-          {
-
-          result.comment &&
-
-          <p className="
-          mt-3
-          text-sm
-          text-gray-600
-          ">
-
-          {result.comment}
-
-          </p>
-
-          }
-
-
-
-
-
-          </div>
-
-
-
-          ))
-
-          }
-
-
-
-          </div>
-
-
-
-<button
-
-onClick={()=>router.push("/student/profile")}
-
-className="
-mt-8
-mr-3
-rounded-lg
-bg-blue-600
-px-6
-py-3
-text-white
-"
-
->
-
-My Profile
-
-</button>
-
-
-
-
-          <button
-
-          onClick={logout}
-
-          className="
-          mt-8
-          rounded-lg
-          bg-red-600
-          px-6
-          py-3
-          text-white
-          "
-
-          >
-
-          Logout
-
-          </button>
-
-
-
-
-
-
-        </div>
-
-
-      </div>
-
-
-    </main>
-
-
-  );
 
 
 }
 
 
 
+</div>
 
 
 
 
-function Info({
 
-title,
-
-value
-
-}:{
-
-title:string;
-
-value:string;
-
-}){
-
-
-return(
-
-<div className="
-rounded-xl
-bg-gray-50
-p-4
-">
-
-
-<p className="
-text-sm
-text-gray-500
-">
-
-{title}
-
-</p>
-
-
-
-<p className="
-mt-1
-font-semibold
-">
-
-{value || "Not Available"}
-
-</p>
 
 
 </div>
 
+</main>
 
-)
+);
+
 
 }
