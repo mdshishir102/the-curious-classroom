@@ -7,319 +7,305 @@ import { supabase } from "@/lib/supabase";
 export default function AdmissionPage() {
 
 
-  const [students,setStudents] = useState<any[]>([]);
+const [students,setStudents] = useState<any[]>([]);
 
-  const [activeTab,setActiveTab] = useState("pending");
+const [activeTab,setActiveTab] = useState("pending");
 
-  const [loading,setLoading] = useState(true);
+const [loading,setLoading] = useState(true);
 
 
 
 
 
-  async function loadStudents(){
+async function loadStudents(){
 
 
-    setLoading(true);
+setLoading(true);
 
 
 
-    const {data,error}=await supabase
+const {data,error}=await supabase
 
-      .from("students")
+.from("students")
 
-      .select("*")
+.select("*")
 
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+.order(
+"created_at",
+{
+ascending:false
+}
+);
 
 
 
 
+console.log(
+"STUDENTS DATA:",
+data
+);
 
-    console.log("STUDENTS DATA:",data);
 
-    console.log("STUDENTS ERROR:",error);
+console.log(
+"STUDENTS ERROR:",
+error
+);
 
 
 
 
+if(error){
 
-    if(error){
+alert(error.message);
 
-      alert(error.message);
+setLoading(false);
 
-      setLoading(false);
+return;
 
-      return;
+}
 
-    }
 
 
+setStudents(data || []);
 
+setLoading(false);
 
 
-    setStudents(data || []);
 
-    setLoading(false);
+}
 
 
 
-  }
 
 
 
+useEffect(()=>{
 
+loadStudents();
 
+},[]);
 
 
-  useEffect(()=>{
 
 
-    loadStudents();
 
 
-  },[]);
 
 
 
+async function updateStatus(
+id:number,
+status:string
+){
 
 
 
+const student = students.find(
 
+item=>item.id===id
 
+);
 
-  async function updateStatus(
-    id:number,
-    status:string
-  ){
 
 
-    console.log(
-      "Updating:",
-      id,
-      status
-    );
+if(!student)
 
+return;
 
 
 
-    const student = students.find(
 
-      item=>item.id===id
 
-    );
 
 
 
 
+// ======================
+// REJECT
+// ======================
 
-    if(!student)
-      return;
 
+if(status==="rejected"){
 
 
 
+const {error}=await supabase
 
+.from("students")
 
+.update({
 
-    // ======================
-    // REJECT
-    // ======================
+status:"rejected"
 
+})
 
-    if(status==="rejected"){
+.eq(
+"id",
+id
+);
 
 
 
-      const {error}=await supabase
 
-      .from("students")
 
-      .update({
+if(error){
 
-        status:"rejected"
+alert(error.message);
 
-      })
+return;
 
-      .eq(
+}
 
-        "id",
 
-        id
 
-      );
+alert("Student Rejected");
 
 
+await loadStudents();
 
 
+setActiveTab("rejected");
 
-      if(error){
 
-        alert(error.message);
+return;
 
-        return;
 
-      }
+}
 
 
 
 
 
-      alert("Student Rejected");
 
 
-      loadStudents();
 
 
-      setActiveTab("rejected");
+// ======================
+// APPROVE
+// ======================
 
 
-      return;
+if(status==="approved"){
 
 
-    }
 
 
 
+const prefix =
 
+student.batch.startsWith("SSC")
 
+?
 
+"TCCS"
 
+:
 
+"TCCH";
 
 
-    // ======================
-    // APPROVE
-    // ======================
 
 
 
-    if(status==="approved"){
 
+const batchYear =
 
+student.batch.replace(/\D/g,"");
 
 
 
-      const prefix =
 
-      student.batch.startsWith("SSC")
 
-      ?
 
-      "TCCS"
 
-      :
+const {
 
-      "TCCH";
+count,
 
+error:countError
 
+}=await supabase
 
+.from("students")
 
+.select("*",{
 
+count:"exact",
 
+head:true
 
-      const batchYear =
+})
 
-      student.batch.replace(/\D/g,"");
+.like(
 
+"student_id",
 
+`${prefix}${batchYear}%`
 
+);
 
 
 
 
 
-      const {
 
-        count,
+if(countError){
 
-        error:countError
+alert(countError.message);
 
-      } = await supabase
+return;
 
-      .from("students")
+}
 
-      .select("*",{
 
-        count:"exact",
 
-        head:true
 
-      })
 
-      .like(
 
-        "student_id",
 
-        `${prefix}${batchYear}%`
+const studentID =
 
-      );
+prefix +
 
+batchYear +
 
+String(
 
+(count || 0)+1
 
+)
 
+.padStart(
 
+3,
 
-      if(countError){
+"0"
 
-        alert(countError.message);
+);
 
-        return;
 
-      }
 
 
 
 
 
+const email =
 
+`${studentID.toLowerCase()}@student.tcc.com`;
 
 
-      const studentID =
 
-      prefix +
 
-      batchYear +
 
-      String(
 
-        (count || 0)+1
+const password =
 
-      )
-
-      .padStart(
-
-        3,
-
-        "0"
-
-      );
-
-
-
-
-
-
-
-
-      const email =
-
-      `${studentID.toLowerCase()}@student.tcc.com`;
-
-
-
-
-
-      const password =
 Math.random()
+
 .toString(36)
+
 .substring(2,10)
+
 .toUpperCase();
 
 
@@ -329,202 +315,167 @@ Math.random()
 
 
 
+const response = await fetch(
 
-      // CREATE AUTH USER
+"/api/create-student-auth",
 
+{
 
-      const response = await fetch(
+method:"POST",
 
-        "/api/create-student-auth",
+headers:{
 
-        {
+"Content-Type":
 
-          method:"POST",
+"application/json"
 
-          headers:{
+},
 
-            "Content-Type":
+body:JSON.stringify({
 
-            "application/json"
+email,
 
-          },
+password
 
+})
 
-          body:JSON.stringify({
 
-            email,
+}
 
-            password
+);
 
-          })
 
 
-        }
 
-      );
 
 
+const result = await response.json();
 
 
 
 
 
-      const result = await response.json();
 
+if(result.error){
 
+alert(result.error);
 
+return;
 
+}
 
-      console.log(
 
-        "AUTH RESULT:",
 
-        result
 
-      );
 
 
 
 
+const {error}=await supabase
 
+.from("students")
 
+.update({
 
-      if(result.error){
+status:"approved",
 
-        alert(result.error);
+student_id:studentID,
 
-        return;
+password:password,
 
-      }
+login_enabled:true,
 
+auth_user_id:result.userId
 
+})
 
+.eq(
 
+"id",
 
+id
 
+);
 
 
 
-      // UPDATE DATABASE
 
 
 
-      const {error}=await supabase
 
-      .from("students")
+if(error){
 
-      .update({
+alert(error.message);
 
-        status:"approved",
+return;
 
-        student_id:studentID,
+}
 
-        password:password,
 
-        login_enabled:true,
 
-        auth_user_id:result.userId
 
-      })
 
-      .eq(
 
-        "id",
 
-        id
+alert(
 
-      );
+`Student Approved
 
+Student ID: ${studentID}
 
+Password: ${password}`
 
+);
 
 
 
 
-      if(error){
 
-        alert(error.message);
 
-        return;
 
-      }
+await loadStudents();
 
 
+setActiveTab("approved");
 
 
 
+}
 
 
 
+}
 
-      alert(
+// ======================
+// FILTER STUDENTS
+// ======================
 
-        `Student Approved\n\nStudent ID: ${studentID}\nPassword: ${password}`
 
-      );
+const filteredStudents = students.filter(student=>{
 
 
+if(activeTab==="pending")
 
+return student.status==="pending";
 
 
 
+if(activeTab==="approved")
 
-      await loadStudents();
+return student.status==="approved";
 
 
 
-      setActiveTab("approved");
+if(activeTab==="rejected")
 
+return student.status==="rejected";
 
 
 
-    }
+return true;
 
 
-
-  }
-
-
-
-
-
-
-
-
-
-  const filteredStudents = students.filter(student=>{
-
-
-
-    if(activeTab==="pending")
-
-      return student.status==="pending";
-
-
-
-
-    if(activeTab==="approved")
-
-      return student.status==="approved";
-
-
-
-
-    if(activeTab==="rejected")
-
-      return student.status==="rejected";
-
-
-
-
-    return true;
-
-
-
-  });
-
-
-
+});
 
 
 
@@ -569,11 +520,13 @@ Admission Management
 
 
 
+
 <div className="
 mb-8
 flex
 gap-4
 ">
+
 
 
 
@@ -596,6 +549,7 @@ text-white
 Pending
 
 </button>
+
 
 
 
@@ -625,6 +579,7 @@ Approved
 
 
 
+
 <button
 
 onClick={()=>setActiveTab("rejected")}
@@ -645,8 +600,9 @@ Rejected
 
 
 
-</div>
 
+
+</div>
 
 
 
@@ -658,9 +614,8 @@ Rejected
 
 {
 
-loading
+loading ?
 
-?
 
 <p>
 
@@ -670,13 +625,13 @@ Loading...
 
 
 
+
+
 :
 
 
-filteredStudents.length===0
+filteredStudents.length===0 ?
 
-
-?
 
 
 <div className="
@@ -691,7 +646,12 @@ No Student Found
 
 
 
+
+
+
 :
+
+
 
 
 <div className="
@@ -720,6 +680,8 @@ shadow
 
 
 
+
+
 <h2 className="
 text-xl
 font-bold
@@ -728,6 +690,8 @@ font-bold
 {student.student_name}
 
 </h2>
+
+
 
 
 
@@ -741,11 +705,15 @@ Class: {student.class}
 
 
 
+
+
 <p>
 
 Batch: {student.batch}
 
 </p>
+
+
 
 
 
@@ -764,7 +732,6 @@ WhatsApp: {student.whatsapp}
 
 
 {
-
 activeTab==="pending"
 
 &&
@@ -775,6 +742,10 @@ mt-5
 flex
 gap-4
 ">
+
+
+
+
 
 
 <button
@@ -833,12 +804,13 @@ Reject
 
 
 
+
+
+
 </div>
 
 
 }
-
-
 
 
 
@@ -855,6 +827,9 @@ activeTab==="approved"
 
 <div className="
 mt-4
+rounded-xl
+bg-green-50
+p-4
 ">
 
 
@@ -862,13 +837,18 @@ mt-4
 
 Student ID:
 
+<b>
+
 {student.student_id}
+
+</b>
 
 </p>
 
 
 
-<p>
+
+<p className="mt-2">
 
 Login:
 
@@ -878,13 +858,22 @@ student.login_enabled
 
 ?
 
-" Active"
+<span className="text-green-700 font-bold">
+
+Active
+
+</span>
 
 :
 
-" Disabled"
+<span className="text-red-700 font-bold">
+
+Disabled
+
+</span>
 
 }
+
 
 </p>
 
@@ -894,6 +883,36 @@ student.login_enabled
 
 
 }
+
+
+
+
+
+
+{
+
+activeTab==="rejected"
+
+&&
+
+
+<div className="
+mt-4
+rounded-xl
+bg-red-50
+p-4
+text-red-700
+">
+
+
+Student Application Rejected
+
+
+</div>
+
+
+}
+
 
 
 
@@ -912,7 +931,6 @@ student.login_enabled
 </div>
 
 
-
 }
 
 
@@ -924,7 +942,6 @@ student.login_enabled
 
 
 );
-
 
 
 }
