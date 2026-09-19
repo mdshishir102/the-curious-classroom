@@ -28,17 +28,17 @@ const [loading,setLoading] = useState(true);
 
 
 
+
+
 async function logout(){
 
 
 await supabase.auth.signOut();
 
 
-
 localStorage.removeItem(
 "admin"
 );
-
 
 
 window.location.href="/admin/login";
@@ -47,17 +47,26 @@ window.location.href="/admin/login";
 }
 
 
+
+
+
+
 useEffect(()=>{
 
 
 async function loadStats(){
 
+
 const {
+
 data:{
 session
+
 }
 
 }=await supabase.auth.getSession();
+
+
 
 
 
@@ -68,6 +77,9 @@ window.location.href="/admin/login";
 return;
 
 }
+
+
+
 
 
 
@@ -89,6 +101,8 @@ session.user.id
 
 
 
+
+
 if(error || !admin || admin.role!=="admin"){
 
 
@@ -97,10 +111,18 @@ await supabase.auth.signOut();
 
 window.location.href="/admin/login";
 
+
 return;
 
 
 }
+
+
+
+
+
+
+
 
 const {count:totalStudents}=
 
@@ -108,13 +130,12 @@ await supabase
 
 .from("students")
 
-.select("*",{
-
+.select("*",
+{
 count:"exact",
-
 head:true
-
 });
+
 
 
 
@@ -128,12 +149,10 @@ await supabase
 
 .from("students")
 
-.select("*",{
-
+.select("*",
+{
 count:"exact",
-
 head:true
-
 })
 
 .eq(
@@ -153,12 +172,10 @@ await supabase
 
 .from("students")
 
-.select("*",{
-
+.select("*",
+{
 count:"exact",
-
 head:true
-
 })
 
 .eq(
@@ -179,14 +196,11 @@ await supabase
 
 .from("results")
 
-.select("*",{
-
+.select("*",
+{
 count:"exact",
-
 head:true
-
 });
-
 
 
 
@@ -208,20 +222,19 @@ totalResults:totalResults || 0
 
 
 
-setLoading(false);
 
+setLoading(false);
 
 
 }
 
 
 
+
 loadStats();
 
 
-
 },[]);
-
 
 
 
@@ -233,17 +246,22 @@ if(loading){
 
 return(
 
-<div className="p-10">
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+bg-blue-50
+font-bold
+">
 
-Loading...
+Loading Admin Panel...
 
 </div>
 
 )
 
-
 }
-
 
 
 
@@ -256,35 +274,92 @@ return(
 
 <main className="
 min-h-screen
-bg-gray-100
-p-8
+bg-gradient-to-br
+from-blue-50
+via-white
+to-indigo-100
+p-6
 ">
 
 
 
 <div className="
+max-w-7xl
 mx-auto
-max-w-6xl
+">
+
+
+
+
+
+{/* HEADER */}
+
+
+
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-5
+flex
+items-center
+justify-between
+mb-8
 ">
 
 
 
 <div className="
-mb-8
 flex
-justify-between
 items-center
+gap-4
 ">
+
+
+<img
+
+src="/logo.png"
+
+className="
+h-16
+w-auto
+"
+
+/>
+
+
+
+<div>
 
 
 <h1 className="
-text-3xl
+text-2xl
 font-bold
+text-blue-700
 ">
 
-Admin Dashboard
+The Curious Classroom
 
 </h1>
+
+
+
+<p className="
+text-gray-500
+">
+
+Admin Portal
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
 
 
 
@@ -293,11 +368,14 @@ Admin Dashboard
 onClick={logout}
 
 className="
-rounded-lg
-bg-red-600
-px-5
-py-2
+rounded-xl
+bg-red-500
+px-6
+py-3
 text-white
+font-bold
+hover:bg-red-600
+transition
 "
 
 >
@@ -315,7 +393,27 @@ Logout
 
 
 
+{/* TITLE */}
 
+
+
+<h1 className="
+text-4xl
+font-bold
+text-gray-800
+mb-8
+">
+
+Dashboard Overview
+
+</h1>
+
+
+
+
+
+
+{/* STATS */}
 
 <div className="
 grid
@@ -325,71 +423,78 @@ md:grid-cols-4
 
 
 
+<StatCard
 
-
-<Card
+icon="👨‍🎓"
 
 title="Total Students"
 
 value={stats.totalStudents}
 
+color="blue"
+
 />
 
 
 
+<StatCard
 
-
-<Card
+icon="✅"
 
 title="Approved Students"
 
 value={stats.approvedStudents}
 
+color="green"
+
 />
 
 
 
 
+<StatCard
 
-<Card
+icon="⏳"
 
 title="Pending Admission"
 
 value={stats.pendingStudents}
 
+color="yellow"
+
 />
 
 
 
 
+<StatCard
 
-<Card
+icon="📊"
 
 title="Total Results"
 
 value={stats.totalResults}
 
+color="purple"
+
 />
-
-
 
 
 
 </div>
 
 
-
-
-
-
-
+// =====================
+// QUICK ACTIONS
+// =====================
 
 
 <h2 className="
-mt-10
-mb-5
-text-xl
+mt-12
+mb-6
+text-2xl
 font-bold
+text-gray-800
 ">
 
 Quick Actions
@@ -400,22 +505,21 @@ Quick Actions
 
 
 
-
-
-
 <div className="
 grid
-gap-5
+gap-6
 md:grid-cols-3
 ">
 
 
 
+<ActionCard
 
-
-<Action
+icon="📥"
 
 title="Pending Admission"
+
+desc="Manage new admissions"
 
 link="/admin"
 
@@ -425,10 +529,13 @@ link="/admin"
 
 
 
+<ActionCard
 
-<Action
+icon="📝"
 
 title="Add Result"
+
+desc="Create student result"
 
 link="/admin/result"
 
@@ -438,38 +545,56 @@ link="/admin/result"
 
 
 
+<ActionCard
 
-<Action
+icon="📊"
 
 title="Manage Result"
+
+desc="Update results"
 
 link="/admin/result/manage"
 
 />
 
 
-<Action
+
+
+
+
+<ActionCard
+
+icon="👨‍🎓"
 
 title="Student Management"
+
+desc="Manage students"
 
 link="/admin/student"
 
 />
 
-<Action
+
+
+
+
+<ActionCard
+
+icon="🏫"
 
 title="Admission Management"
+
+desc="Control admission"
 
 link="/admin/admission"
 
 />
 
+
+
+
+
 </div>
-
-
-
-
-
 
 
 
@@ -481,44 +606,89 @@ link="/admin/admission"
 
 )
 
-
 }
 
 
 
 
+// =====================
+// STAT CARD
+// =====================
 
 
+function StatCard({
 
-
-function Card({
+icon,
 
 title,
 
-value
+value,
+
+color
 
 }:{
+
+icon:string;
 
 title:string;
 
 value:number;
 
+color:string;
+
 }){
+
+
+const colors:any={
+
+
+blue:"bg-blue-50 text-blue-700",
+
+green:"bg-green-50 text-green-700",
+
+yellow:"bg-yellow-50 text-yellow-700",
+
+purple:"bg-purple-50 text-purple-700"
+
+
+};
+
 
 
 return(
 
 
 <div className="
-rounded-2xl
 bg-white
+rounded-3xl
+shadow-lg
 p-6
-shadow
+hover:shadow-xl
+transition
 ">
 
 
+<div className={`
+h-14
+w-14
+rounded-2xl
+flex
+items-center
+justify-center
+text-3xl
+${colors[color]}
+`}>
+
+{icon}
+
+</div>
+
+
+
 <p className="
+mt-5
 text-gray-500
+font-medium
 ">
 
 {title}
@@ -526,23 +696,23 @@ text-gray-500
 </p>
 
 
-<p className="
-mt-3
+
+<h2 className="
+mt-2
 text-4xl
 font-bold
-text-blue-600
+text-gray-800
 ">
 
 {value}
 
-</p>
+</h2>
 
 
 </div>
 
 
 )
-
 
 }
 
@@ -552,17 +722,28 @@ text-blue-600
 
 
 
+// =====================
+// ACTION CARD
+// =====================
 
 
-function Action({
+function ActionCard({
+
+icon,
 
 title,
+
+desc,
 
 link
 
 }:{
 
+icon:string;
+
 title:string;
+
+desc:string;
 
 link:string;
 
@@ -577,17 +758,35 @@ return(
 href={link}
 
 className="
-rounded-xl
 bg-white
+rounded-3xl
+shadow-lg
 p-6
-shadow
-hover:bg-blue-50
+hover:shadow-2xl
+hover:-translate-y-1
+transition
+block
 "
+
 
 >
 
+
+<div className="
+text-4xl
+">
+
+{icon}
+
+</div>
+
+
+
 <h3 className="
+mt-5
+text-xl
 font-bold
+text-gray-800
 ">
 
 {title}
@@ -595,10 +794,32 @@ font-bold
 </h3>
 
 
+
+<p className="
+mt-2
+text-gray-500
+">
+
+{desc}
+
+</p>
+
+
+
+<div className="
+mt-5
+text-blue-600
+font-bold
+">
+
+Open →
+
+</div>
+
+
 </Link>
 
 
 )
-
 
 }
