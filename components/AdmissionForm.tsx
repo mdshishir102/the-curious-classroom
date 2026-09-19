@@ -112,7 +112,14 @@ setForm(prev=>({
 
 class:value,
 
-batch
+batch,
+
+college:
+(value==="Class 9" || value==="Class 10")
+?
+""
+:
+prev.college
 
 }));
 
@@ -961,13 +968,21 @@ text-blue-700
 
 <input
 
+required
+
 name="school"
 
 value={form.school}
 
 onChange={handleChange}
 
-placeholder="স্কুলের নাম"
+placeholder={
+(form.class==="Class 11" || form.class==="Class 12")
+?
+"পূর্ববর্তী স্কুলের নাম"
+:
+"স্কুলের নাম"
+}
 
 className="
 mb-4
@@ -982,8 +997,12 @@ p-3
 
 
 
+{
+(form.class==="Class 11" || form.class==="Class 12") &&
 
 <input
+
+required
 
 name="college"
 
@@ -1001,6 +1020,8 @@ p-3
 "
 
 />
+
+}
 
 
 

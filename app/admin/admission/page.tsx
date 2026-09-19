@@ -679,6 +679,27 @@ shadow
 >
 
 
+{
+student.student_photo &&
+
+<img
+
+src={student.student_photo}
+
+alt={student.student_name}
+
+className="
+mb-4
+h-24
+w-24
+rounded-full
+object-cover
+border
+"
+
+/>
+
+}
 
 
 
@@ -726,7 +747,20 @@ WhatsApp: {student.whatsapp}
 
 
 
+<p>
 
+Guardian:
+{student.guardian_name}
+
+</p>
+
+
+<p>
+
+School:
+{student.school}
+
+</p>
 
 
 
@@ -846,6 +880,14 @@ Student ID:
 </p>
 
 
+
+<p className="mt-2">
+
+Email:
+
+{student.student_id?.toLowerCase()}@student.tcc.com
+
+</p>
 
 
 <p className="mt-2">
