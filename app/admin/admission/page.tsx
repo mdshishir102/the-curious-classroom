@@ -95,6 +95,53 @@ alert("Payment Verified");
 loadStudents();
 
 
+
+}
+
+
+
+
+
+
+// ======================
+// SEND WHATSAPP
+// ======================
+
+
+function sendWhatsApp(student:any){
+
+
+const message =
+
+`Assalamu Alaikum ${student.student_name},
+
+আপনার ভর্তি আবেদন অনুমোদিত হয়েছে।
+
+Student ID:
+${student.student_id}
+
+Password:
+${student.password}
+
+Login Link:
+https://thecuriousclassroom.vercel.app/student/login
+
+ধন্যবাদ।
+
+The Curious Classroom`;
+
+
+
+const url =
+
+`https://wa.me/88${student.whatsapp}?text=${encodeURIComponent(message)}`;
+
+
+
+window.open(url,"_blank");
+
+
+
 }
 
 
@@ -1611,6 +1658,28 @@ Password:
 
 </p>
 
+
+
+<button
+
+onClick={()=>sendWhatsApp(selectedStudent)}
+
+className="
+mt-5
+rounded-xl
+bg-green-600
+px-6
+py-3
+font-bold
+text-white
+hover:bg-green-700
+"
+
+>
+
+📱 Send Login Info WhatsApp
+
+</button>
 
 
 </div>
