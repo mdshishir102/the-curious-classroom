@@ -2,6 +2,7 @@
 
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 
@@ -11,16 +12,7 @@ export default function AdminStudentPage(){
 
 const [students,setStudents] = useState<any[]>([]);
 
-const [filteredStudents,setFilteredStudents] = useState<any[]>([]);
-
-
-const [search,setSearch] = useState("");
-
-
 const [loading,setLoading] = useState(true);
-
-
-
 
 
 
@@ -38,36 +30,26 @@ const {data,error}=await supabase
 .eq(
 "status",
 "approved"
-)
-
-.order(
-"created_at",
-{
-ascending:false
-}
 );
 
 
 
+if(error){
 
+alert(error.message);
 
-if(!error){
-
-setStudents(data || []);
-
-setFilteredStudents(data || []);
+return;
 
 }
 
 
+
+setStudents(data || []);
 
 setLoading(false);
 
 
-
 }
-
-
 
 
 
@@ -87,181 +69,62 @@ loadStudents();
 
 
 
+const classes=[
+
+"Class 9",
+
+"Class 10",
+
+"Class 11",
+
+"Class 12"
+
+];
 
 
-useEffect(()=>{
-
-
-let data=[...students];
 
 
 
-if(search){
 
 
-data=data.filter(student=>
+function getClassCount(className:string){
 
 
-student.student_name
+return students.filter(
 
-.toLowerCase()
+student=>student.class===className
 
-.includes(
-search.toLowerCase()
+).length;
+
+
+}
+
+
+
+
+
+
+
+if(loading){
+
+
+return(
+
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+font-bold
+">
+
+Loading Students...
+
+</div>
+
 )
 
-
-||
-
-student.student_id
-
-.toLowerCase()
-
-.includes(
-search.toLowerCase()
-)
-
-
-||
-
-student.whatsapp
-
-.includes(search)
-
-
-
-);
-
-
 }
-
-
-
-setFilteredStudents(data);
-
-
-
-},[
-search,
-students
-]);
-
-
-
-
-
-
-
-
-
-async function toggleLogin(
-student:any
-){
-
-
-
-const {error}=await supabase
-
-.from("students")
-
-.update({
-
-login_enabled:
-!student.login_enabled
-
-})
-
-.eq(
-"id",
-student.id
-);
-
-
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-loadStudents();
-
-
-
-}
-
-
-
-
-async function resetPassword(student:any){
-
-
-const newPassword =
-Math.random()
-.toString(36)
-.substring(2,10)
-.toUpperCase();
-
-
-
-const response = await fetch(
-"/api/reset-student-password",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-userId:student.auth_user_id,
-
-studentDbId:student.id,
-
-password:newPassword
-
-})
-
-}
-
-);
-
-
-
-const result = await response.json();
-
-
-
-if(result.error){
-
-alert(result.error);
-
-return;
-
-}
-
-
-
-alert(
-`New Password: ${newPassword}`
-);
-
-
-}
-
-
-
-
-
-
 
 
 
@@ -274,23 +137,29 @@ return(
 
 <main className="
 min-h-screen
-bg-gray-100
-p-8
+bg-gradient-to-br
+from-blue-50
+via-white
+to-indigo-100
+p-6
 ">
 
 
 
 <div className="
+max-w-7xl
 mx-auto
-max-w-6xl
 ">
 
 
 
+
+
 <h1 className="
-mb-8
-text-3xl
+text-4xl
 font-bold
+text-gray-800
+mb-8
 ">
 
 Student Management
@@ -303,277 +172,121 @@ Student Management
 
 
 
-<input
+<div className="
+grid
+gap-6
+md:grid-cols-2
+lg:grid-cols-4
+">
+
+
+
+
+
+{
+
+classes.map((item,index)=>(
+
+
+<Link
+
+key={item}
+
+href={`/admin/student/${encodeURIComponent(item)}`}
 
 className="
-mb-8
-w-full
-rounded-lg
+bg-white
+rounded-3xl
+shadow-lg
+p-8
+hover:shadow-2xl
+hover:-translate-y-1
+transition
 border
-p-3
+border-gray-100
 "
 
-placeholder="Search Name / Student ID / Phone"
-
-value={search}
-
-onChange={
-e=>setSearch(e.target.value)
-}
-
-/>
-
-
-
-
-
-
-
-
-{
-
-loading ?
-
-
-<p>
-Loading...
-</p>
-
-
-
-:
-
-
-filteredStudents.length===0 ?
-
-
-<div className="
-rounded-xl
-bg-white
-p-6
-">
-
-No Student Found
-
-</div>
-
-
-
-:
-
-
-
-<div className="
-space-y-5
-">
-
-
-
-{
-
-filteredStudents.map(student=>(
-
-
-
-<div
-
-key={student.id}
-
-className="
-rounded-2xl
-bg-white
-p-6
-shadow
-"
 
 >
 
 
 <div className="
-flex
-justify-between
-items-center
+text-5xl
+mb-5
 ">
 
+{
 
+index===0
+?
+"📘"
+:
+index===1
+?
+"📗"
+:
+index===2
+?
+"📙"
+:
+"📕"
 
+}
 
+</div>
 
-<div>
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
+text-blue-700
 ">
 
-{student.student_name}
+{item}
 
 </h2>
 
 
 
-<p>
-
-{student.student_id}
-
-</p>
-
-
-
-<p>
-
-Class: {student.class}
-
-</p>
-
-
-
-<p>
-
-Batch: {student.batch}
-
-</p>
-
-
-
-<p>
-
-Phone: {student.whatsapp}
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-
-<div className="
-text-right
+<p className="
+mt-3
+text-gray-500
 ">
+
+Total Students
+
+</p>
+
 
 
 <p className="
+text-4xl
 font-bold
+mt-2
 ">
 
-{
-
-student.login_enabled
-
-?
-
-"Login Active"
-
-:
-
-"Login Disabled"
-
-}
-
+{getClassCount(item)}
 
 </p>
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
 
 
 
 
 <div className="
 mt-5
-flex
-gap-4
+text-blue-600
+font-bold
 ">
 
-
-
-
-
-<button
-
-onClick={()=>
-toggleLogin(student)
-}
-
-className="
-rounded-lg
-bg-blue-600
-px-5
-py-2
-text-white
-"
-
->
-
-{
-
-student.login_enabled
-
-?
-
-"Disable Login"
-
-:
-
-"Enable Login"
-
-}
-
-
-</button>
-
-
-
-
-
-
-
-<button
-
-onClick={()=>
-resetPassword(student)
-}
-
-className="
-rounded-lg
-bg-yellow-500
-px-5
-py-2
-text-white
-"
-
->
-
-Reset Password
-
-</button>
-
-
-
-
-
+View Students →
 
 </div>
 
 
 
+</Link>
 
-</div>
 
 
 ))
@@ -583,11 +296,11 @@ Reset Password
 
 
 
+
+
 </div>
 
 
-
-}
 
 
 
