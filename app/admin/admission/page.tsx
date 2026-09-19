@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 
-export default function AdmissionPage() {
-
+export default function AdmissionPage(){
 
 const [students,setStudents] = useState<any[]>([]);
 
@@ -16,42 +15,19 @@ const [loading,setLoading] = useState(true);
 
 
 
+// ======================
+// LOAD STUDENTS
+// ======================
 
 async function loadStudents(){
-
 
 setLoading(true);
 
 
-
 const {data,error}=await supabase
-
 .from("students")
-
 .select("*")
-
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-
-
-
-console.log(
-"STUDENTS DATA:",
-data
-);
-
-
-console.log(
-"STUDENTS ERROR:",
-error
-);
-
-
+.order("created_at",{ascending:false});
 
 
 if(error){
@@ -65,16 +41,11 @@ return;
 }
 
 
-
 setStudents(data || []);
 
 setLoading(false);
 
-
-
 }
-
-
 
 
 
@@ -88,23 +59,22 @@ loadStudents();
 
 
 
+
+// ======================
+// MARK PAYMENT PAID
+// ======================
+
 async function markAsPaid(id:number){
 
 
 const {error}=await supabase
-
 .from("students")
-
 .update({
 
 payment_status:"paid"
 
 })
-
-.eq(
-"id",
-id
-);
+.eq("id",id);
 
 
 
@@ -118,8 +88,7 @@ return;
 
 
 
-alert("Payment marked as paid");
-
+alert("Payment Verified");
 
 loadStudents();
 
@@ -129,58 +98,40 @@ loadStudents();
 
 
 
+
+// ======================
+// APPROVE / REJECT
+// ======================
+
+
 async function updateStatus(
 id:number,
 status:string
 ){
 
 
-
-const student = students.find(
-
+const student =
+students.find(
 item=>item.id===id
-
 );
 
 
 
-if(!student)
+if(!student) return;
 
-return;
-
-
-
-
-
-
-
-
-
-// ======================
-// REJECT
-// ======================
 
 
 if(status==="rejected"){
 
 
-
 const {error}=await supabase
-
 .from("students")
-
 .update({
 
 status:"rejected"
 
 })
-
-.eq(
-"id",
-id
-);
-
-
+.eq("id",id);
 
 
 
@@ -194,14 +145,9 @@ return;
 
 
 
-alert("Student Rejected");
+alert("Rejected");
 
-
-await loadStudents();
-
-
-setActiveTab("rejected");
-
+loadStudents();
 
 return;
 
@@ -211,220 +157,71 @@ return;
 
 
 
-
-
-
-
-
-// ======================
-// APPROVE
-// ======================
 
 
 if(status==="approved"){
 
 
-    if(student.payment_status !== "paid"){
 
-alert("আগে Payment Clear করুন");
+if(student.payment_status!=="paid"){
 
-return;
-
-}
-
-if(student.payment_status !== "paid"){
-
-alert("Payment not completed");
+alert("Payment clear না হলে approve করা যাবে না");
 
 return;
 
 }
+
+
 
 
 const prefix =
-
-student.batch.startsWith("SSC")
-
+student.batch?.startsWith("SSC")
 ?
-
 "TCCS"
-
 :
-
 "TCCH";
 
 
 
-
-
-
 const batchYear =
-
 student.batch.replace(/\D/g,"");
 
 
 
-
-
-
-
 const {
-
-count,
-
-error:countError
-
+count
 }=await supabase
-
 .from("students")
-
-.select("*",{
-
+.select("*",
+{
 count:"exact",
-
 head:true
-
 })
-
 .like(
-
 "student_id",
-
 `${prefix}${batchYear}%`
-
 );
-
-
-
-
-
-
-if(countError){
-
-alert(countError.message);
-
-return;
-
-}
-
-
-
-
 
 
 
 const studentID =
-
-prefix +
-
-batchYear +
-
-String(
-
-(count || 0)+1
-
-)
-
-.padStart(
-
-3,
-
-"0"
-
-);
-
-
-
-
-
-
-
-const email =
-
-`${studentID.toLowerCase()}@student.tcc.com`;
-
-
-
+prefix+
+batchYear+
+String((count||0)+1)
+.padStart(3,"0");
 
 
 
 const password =
-
 Math.random()
-
 .toString(36)
-
 .substring(2,10)
-
 .toUpperCase();
 
 
 
-
-
-
-
-
-const response = await fetch(
-
-"/api/create-student-auth",
-
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":
-
-"application/json"
-
-},
-
-body:JSON.stringify({
-
-email,
-
-password
-
-})
-
-
-}
-
-);
-
-
-
-
-
-
-const result = await response.json();
-
-
-
-
-
-
-if(result.error){
-
-alert(result.error);
-
-return;
-
-}
-
-
-
-
-
-
-
-
 const {error}=await supabase
-
 .from("students")
-
 .update({
 
 status:"approved",
@@ -433,22 +230,10 @@ student_id:studentID,
 
 password:password,
 
-login_enabled:true,
-
-auth_user_id:result.userId
+login_enabled:true
 
 })
-
-.eq(
-
-"id",
-
-id
-
-);
-
-
-
+.eq("id",id);
 
 
 
@@ -463,31 +248,13 @@ return;
 
 
 
-
-
-
-
 alert(
-
-`Student Approved
-
-Student ID: ${studentID}
-
-Password: ${password}`
-
+`Approved\n\nID: ${studentID}\nPassword: ${password}`
 );
 
 
 
-
-
-
-
-await loadStudents();
-
-
-setActiveTab("approved");
-
+loadStudents();
 
 
 }
@@ -495,6 +262,8 @@ setActiveTab("approved");
 
 
 }
+
+
 
 // ======================
 // FILTER STUDENTS
@@ -532,32 +301,28 @@ return true;
 
 
 
-
-
-
-return(
-
+return (
 
 <main className="
 min-h-screen
-bg-gray-100
-p-8
+bg-gradient-to-br
+from-gray-100
+to-blue-50
+p-6
 ">
 
 
 <div className="
 mx-auto
-max-w-6xl
+max-w-7xl
 ">
-
-
-
 
 
 <h1 className="
 mb-8
-text-3xl
+text-4xl
 font-bold
+text-gray-800
 ">
 
 Admission Management
@@ -568,18 +333,15 @@ Admission Management
 
 
 
-
+{/* Tabs */}
 
 
 <div className="
 mb-8
 flex
 gap-4
+flex-wrap
 ">
-
-
-
-
 
 
 <button
@@ -587,10 +349,11 @@ gap-4
 onClick={()=>setActiveTab("pending")}
 
 className="
-rounded-lg
-bg-blue-600
-px-5
-py-2
+rounded-xl
+bg-yellow-500
+px-6
+py-3
+font-bold
 text-white
 "
 
@@ -603,18 +366,16 @@ Pending
 
 
 
-
-
-
 <button
 
 onClick={()=>setActiveTab("approved")}
 
 className="
-rounded-lg
+rounded-xl
 bg-green-600
-px-5
-py-2
+px-6
+py-3
+font-bold
 text-white
 "
 
@@ -628,17 +389,16 @@ Approved
 
 
 
-
-
 <button
 
 onClick={()=>setActiveTab("rejected")}
 
 className="
-rounded-lg
+rounded-xl
 bg-red-600
-px-5
-py-2
+px-6
+py-3
+font-bold
 text-white
 "
 
@@ -650,12 +410,7 @@ Rejected
 
 
 
-
-
 </div>
-
-
-
 
 
 
@@ -667,13 +422,16 @@ Rejected
 loading ?
 
 
-<p>
+<div className="
+rounded-xl
+bg-white
+p-10
+text-center
+">
 
 Loading...
 
-</p>
-
-
+</div>
 
 
 
@@ -683,11 +441,11 @@ Loading...
 filteredStudents.length===0 ?
 
 
-
 <div className="
 rounded-xl
 bg-white
-p-6
+p-10
+text-center
 ">
 
 No Student Found
@@ -697,15 +455,11 @@ No Student Found
 
 
 
-
-
 :
 
 
-
-
 <div className="
-space-y-5
+space-y-6
 ">
 
 
@@ -720,42 +474,40 @@ filteredStudents.map(student=>(
 key={student.id}
 
 className="
-rounded-2xl
+rounded-3xl
 bg-white
 p-6
-shadow
+shadow-lg
+border
+transition
+hover:shadow-xl
 "
 
 >
 
 
-{
-student.student_photo &&
 
-<img
+<div className="
+flex
+flex-col
+md:flex-row
+gap-6
+">
 
-src={student.student_photo}
 
-alt={student.student_name}
 
-className="
-mb-4
-h-24
-w-24
-rounded-full
-object-cover
-border
-"
+{/* INFORMATION LEFT */}
 
-/>
 
-}
-
+<div className="
+flex-1
+">
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
+text-blue-700
 ">
 
 {student.student_name}
@@ -764,101 +516,296 @@ font-bold
 
 
 
-
-
-
-<p>
-
-Class: {student.class}
-
-</p>
-
-
-
-
+<div className="
+mt-4
+space-y-2
+text-gray-700
+">
 
 
 <p>
-
-Batch: {student.batch}
-
-</p>
-
-
-
-
-
-
-<p>
-
-WhatsApp: {student.whatsapp}
-
-</p>
-
-
-<p>
-Payment Method:
+🎓 Class:
 <b>
-{student.payment_method}
+{student.class}
 </b>
 </p>
 
 
 <p>
-Payment Status:
+📚 Batch:
 <b>
-{student.payment_status}
+{student.batch}
 </b>
 </p>
 
 
 <p>
-
-Guardian:
+👨‍👩‍👦 Guardian:
 {student.guardian_name}
-
 </p>
 
 
 <p>
+📱 WhatsApp:
+{student.whatsapp}
+</p>
 
-School:
+
+<p>
+🏫 School:
 {student.school}
+</p>
+
+
+</div>
+
+
+
+
+
+<hr className="
+my-5
+"/>
+
+
+
+
+
+<h3 className="
+text-lg
+font-bold
+text-blue-700
+">
+
+💳 Payment Information
+
+</h3>
+
+
+
+<div className="
+mt-3
+space-y-2
+">
+
+
+<p>
+
+Method:
+
+<b>
+
+{
+
+student.payment_method==="bkash"
+
+?
+
+" bKash"
+
+:
+
+" Offline"
+
+}
+
+</b>
 
 </p>
+
+
+
+
+
+<p>
+
+Status:
+
+
+{
+
+student.payment_status==="paid"
+
+
+?
+
+
+<span className="
+ml-2
+rounded-full
+bg-green-100
+px-3
+py-1
+text-green-700
+font-bold
+">
+
+PAID
+
+</span>
+
+
+:
+
+
+<span className="
+ml-2
+rounded-full
+bg-yellow-100
+px-3
+py-1
+text-yellow-700
+font-bold
+">
+
+PENDING
+
+</span>
+
+
+}
+
+
+
+</p>
+
 
 
 
 
 {
+
+student.payment_method==="bkash"
+
+&&
+
+<>
+
+<p>
+
+bKash Number:
+
+{student.bkash_number}
+
+</p>
+
+
+
+<p>
+
+Transaction ID:
+
+{student.transaction_id}
+
+</p>
+
+
+</>
+
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+{/* PHOTO RIGHT */}
+
+
+<div className="
+md:w-56
+flex
+justify-center
+">
+
+
+<img
+
+src={student.student_photo}
+
+alt={student.student_name}
+
+className="
+h-52
+w-52
+rounded-3xl
+object-cover
+border-4
+border-blue-100
+shadow
+"
+
+/>
+
+
+</div>
+
+
+
+</div>
+
+// ======================
+// ACTION BUTTONS
+// ======================
+
+
+{
+
 activeTab==="pending"
 
 &&
 
 
 <div className="
-mt-5
+mt-6
 flex
 gap-4
+flex-wrap
 ">
-
 
 
 <button
 
 onClick={()=>markAsPaid(student.id)}
 
+disabled={
+student.payment_status==="paid"
+}
+
 className="
-rounded-lg
+rounded-xl
 bg-yellow-500
 px-5
-py-2
+py-3
+font-bold
 text-white
+disabled:bg-gray-300
 "
 
 >
 
-Mark as Paid
+{
+
+student.payment_status==="paid"
+
+?
+
+"Payment Verified"
+
+:
+
+"Mark as Paid"
+
+}
+
 
 </button>
 
@@ -869,19 +816,22 @@ Mark as Paid
 <button
 
 onClick={()=>updateStatus(
-
 student.id,
-
 "approved"
-
 )}
 
+disabled={
+student.payment_status!=="paid"
+}
+
 className="
-rounded-lg
+rounded-xl
 bg-green-600
 px-5
-py-2
+py-3
+font-bold
 text-white
+disabled:bg-gray-300
 "
 
 >
@@ -895,22 +845,19 @@ Approve
 
 
 
-
 <button
 
 onClick={()=>updateStatus(
-
 student.id,
-
 "rejected"
-
 )}
 
 className="
-rounded-lg
+rounded-xl
 bg-red-600
 px-5
-py-2
+py-3
+font-bold
 text-white
 "
 
@@ -919,9 +866,6 @@ text-white
 Reject
 
 </button>
-
-
-
 
 
 
@@ -944,14 +888,30 @@ activeTab==="approved"
 
 
 <div className="
-mt-4
-rounded-xl
+mt-5
+rounded-2xl
 bg-green-50
-p-4
+p-5
+border
+border-green-200
 ">
 
 
-<p>
+<h3 className="
+font-bold
+text-green-700
+text-lg
+">
+
+✅ Student Approved
+
+</h3>
+
+
+
+<p className="
+mt-3
+">
 
 Student ID:
 
@@ -965,51 +925,47 @@ Student ID:
 
 
 
-<p className="mt-2">
 
-Email:
+<p className="
+mt-2
+">
 
-{student.student_id?.toLowerCase()}@student.tcc.com
+Password:
+
+<b>
+
+{student.password}
+
+</b>
 
 </p>
 
 
-<p className="mt-2">
 
-Login:
+<p className="
+mt-2
+">
 
-{
+Login Status:
 
-student.login_enabled
-
-?
-
-<span className="text-green-700 font-bold">
+<span className="
+ml-2
+font-bold
+text-green-700
+">
 
 Active
 
 </span>
 
-:
-
-<span className="text-red-700 font-bold">
-
-Disabled
-
-</span>
-
-}
-
 
 </p>
-
 
 
 </div>
 
 
 }
-
 
 
 
@@ -1023,22 +979,20 @@ activeTab==="rejected"
 
 
 <div className="
-mt-4
+mt-5
 rounded-xl
 bg-red-50
 p-4
 text-red-700
+font-bold
 ">
 
-
-Student Application Rejected
-
+❌ Admission Rejected
 
 </div>
 
 
 }
-
 
 
 
@@ -1058,7 +1012,6 @@ Student Application Rejected
 
 
 }
-
 
 
 </div>
