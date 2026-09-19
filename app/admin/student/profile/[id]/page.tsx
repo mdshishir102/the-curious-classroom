@@ -307,6 +307,18 @@ value={student.date_of_birth}
 
 
 <Item
+label="Admission Date"
+value={
+student.admission_date
+?
+new Date(student.admission_date).toLocaleDateString("en-GB")
+:
+"N/A"
+}
+/>
+
+
+<Item
 label="Class"
 value={student.class}
 />
