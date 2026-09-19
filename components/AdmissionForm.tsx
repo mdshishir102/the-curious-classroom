@@ -7,13 +7,15 @@ import { supabase } from "@/lib/supabase";
 
 export default function AdmissionForm(){
 
+
 const [loading,setLoading]=useState(false);
 
 const [photoPreview,setPhotoPreview]=useState("");
 
 const [photo,setPhoto]=useState<File|null>(null);
 
-const [submitted,setSubmitted]=useState(false);
+const [success,setSuccess]=useState(false);
+
 
 
 const [form,setForm]=useState({
@@ -54,12 +56,16 @@ transaction_id:""
 
 
 
+
+
 function handleChange(e:any){
+
 
 const {
 name,
 value
 }=e.target;
+
 
 
 
@@ -77,6 +83,7 @@ value==="Class 9" ||
 value==="Class 10"
 ){
 
+
 const sscYear =
 value==="Class 9"
 ?
@@ -85,11 +92,12 @@ year+2
 year+1;
 
 
+
 batch=
 `SSC ${String(sscYear).slice(-2)}`;
 
-
 }
+
 
 
 
@@ -107,10 +115,12 @@ year+2
 year+1;
 
 
+
 batch=
 `HSC ${String(hscYear).slice(-2)}`;
 
 }
+
 
 
 
@@ -123,7 +133,8 @@ class:value,
 batch,
 
 college:
-(value==="Class 9" || value==="Class 10")
+(value==="Class 9" ||
+value==="Class 10")
 ?
 ""
 :
@@ -133,7 +144,6 @@ prev.college
 
 
 return;
-
 
 }
 
@@ -149,6 +159,7 @@ setForm(prev=>({
 }));
 
 
+
 }
 
 
@@ -156,7 +167,9 @@ setForm(prev=>({
 
 
 
+
 async function uploadPhoto(){
+
 
 
 if(!photo){
@@ -169,17 +182,22 @@ throw new Error(
 
 
 
-const fileName =
+
+const fileName=
+
 `${Date.now()}-${photo.name}`;
+
 
 
 
 const {
 error
-}
-=
+}=
+
 await supabase.storage
+
 .from("student-photos")
+
 .upload(
 fileName,
 photo
@@ -193,12 +211,15 @@ throw error;
 
 
 
+
 const {
 data
-}
-=
+}=
+
 supabase.storage
+
 .from("student-photos")
+
 .getPublicUrl(
 fileName
 );
@@ -222,6 +243,7 @@ async function submitAdmission(e:any){
 e.preventDefault();
 
 
+
 try{
 
 
@@ -229,18 +251,24 @@ setLoading(true);
 
 
 
+
 const {
 data:existing
-}
-=
+}=
+
 await supabase
+
 .from("students")
+
 .select("id")
+
 .eq(
 "whatsapp",
 form.whatsapp
 )
+
 .maybeSingle();
+
 
 
 
@@ -257,8 +285,11 @@ return;
 
 
 
+
+
 const photoURL =
 await uploadPhoto();
+
 
 
 
@@ -272,15 +303,16 @@ new Date()
 
 const {
 error
-}
-=
+}=
+
 await supabase
+
 .from("students")
+
 .insert({
 
 student_name:
 form.student_name,
-
 
 student_photo:
 photoURL,
@@ -363,7 +395,7 @@ throw error;
 
 
 
-setSubmitted(true);
+setSuccess(true);
 
 
 
@@ -375,28 +407,59 @@ alert(err.message);
 
 }
 
+
 finally{
+
 
 setLoading(false);
 
-}
-
 
 }
 
 
-if(submitted){
+}
 
-return(
+
+
+
+return (
 
 <div className="
 min-h-screen
 bg-gradient-to-br
 from-blue-50
 to-white
+px-5
+py-10
+">
+
+
+<div className="
+mx-auto
+max-w-4xl
+rounded-3xl
+bg-white
+p-6
+shadow-xl
+md:p-10
+">
+
+
+
+{/* SUCCESS POPUP */}
+
+{
+
+success &&
+
+<div className="
+fixed
+inset-0
+z-50
 flex
 items-center
 justify-center
+bg-black/50
 p-5
 ">
 
@@ -407,18 +470,21 @@ rounded-3xl
 bg-white
 p-8
 text-center
-shadow-xl
+shadow-2xl
 ">
 
 
 <div className="
 text-6xl
 ">
+
 🎉
+
 </div>
 
 
-<h1 className="
+
+<h2 className="
 mt-5
 text-3xl
 font-bold
@@ -427,36 +493,47 @@ text-green-600
 
 আবেদন সফল হয়েছে
 
-</h1>
+</h2>
+
 
 
 <p className="
 mt-5
-text-gray-700
 leading-8
+text-gray-700
 ">
+
 
 আপনার ভর্তি আবেদনটি সফলভাবে গ্রহণ করা হয়েছে।
 
+
 <br/><br/>
+
 
 আমাদের টিম আপনার তথ্য ও পেমেন্ট যাচাই করবে।
 
+
 <br/><br/>
+
 
 আবেদন সঠিক হলে আপনার
 
 <br/>
 
-<b>Student ID</b>
+<b>
+Student ID
+</b>
 
 এবং
 
-<b>Login Password</b>
+<b>
+Login Password
+</b>
 
 <br/>
 
-আপনার দেওয়া WhatsApp নম্বরে পাঠিয়ে দেওয়া হবে।
+আপনার WhatsApp নম্বরে পাঠানো হবে।
+
 
 </p>
 
@@ -486,47 +563,27 @@ rounded-xl
 bg-blue-600
 px-8
 py-3
-text-white
 font-bold
+text-white
 "
 
 >
 
-হোম পেজে যান
+Home
 
 </button>
 
 
-</div>
 
 </div>
 
-)
+
+</div>
+
 
 }
 
 
-return (
-
-<div className="
-min-h-screen
-bg-gradient-to-br
-from-blue-50
-to-white
-px-5
-py-10
-">
-
-
-<div className="
-mx-auto
-max-w-4xl
-rounded-3xl
-bg-white
-p-6
-shadow-xl
-md:p-10
-">
 
 
 
@@ -591,74 +648,34 @@ The Curious Classroom এর সাথে
 </p>
 
 
-
-<div className="
-mt-6
-flex
-flex-wrap
-justify-center
-gap-3
-">
-
-
-<span className="
-rounded-full
-bg-white/20
-px-4
-py-2
-">
-
-✓ Online Learning
-
-</span>
-
-
-<span className="
-rounded-full
-bg-white/20
-px-4
-py-2
-">
-
-✓ Regular Exam
-
-</span>
-
-
-<span className="
-rounded-full
-bg-white/20
-px-4
-py-2
-">
-
-✓ Student Dashboard
-
-</span>
-
-
-
 </div>
 
 
-</div>
 
-{/* FORM START */}
+
+
+
 
 <form
+
 onSubmit={submitAdmission}
+
 className="
 space-y-8
 "
+
 >
 
 
-{/* Student Information */}
+
+
+
+{/* STUDENT INFO */}
+
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
@@ -674,6 +691,7 @@ text-blue-700
 🎓 শিক্ষার্থীর তথ্য
 
 </h2>
+
 
 
 
@@ -695,11 +713,11 @@ w-full
 rounded-xl
 border
 p-3
-outline-none
-focus:border-blue-500
 "
 
 />
+
+
 
 
 
@@ -707,7 +725,6 @@ focus:border-blue-500
 mb-2
 block
 font-medium
-text-gray-700
 ">
 
 শিক্ষার্থীর ছবি *
@@ -727,8 +744,7 @@ accept="image/*"
 onChange={(e)=>{
 
 
-const file =
-e.target.files?.[0];
+const file=e.target.files?.[0];
 
 
 if(file){
@@ -755,51 +771,28 @@ p-3
 
 
 
+
+
 {
 
 photoPreview &&
-
-<div className="
-mt-4
-flex
-justify-center
-">
-
 
 <img
 
 src={photoPreview}
 
-alt="preview"
-
 className="
+mt-4
 h-32
 w-32
 rounded-2xl
 object-cover
-shadow
 "
 
 />
 
-
-</div>
-
 }
 
-
-
-<label className="
-mt-5
-mb-2
-block
-font-medium
-text-gray-700
-">
-
-জন্ম তারিখ
-
-</label>
 
 
 
@@ -816,6 +809,7 @@ value={form.date_of_birth}
 onChange={handleChange}
 
 className="
+mt-4
 w-full
 rounded-xl
 border
@@ -833,13 +827,13 @@ p-3
 
 
 
-{/* Guardian Information */}
+
+{/* GUARDIAN */}
 
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
@@ -887,15 +881,13 @@ p-3
 
 required
 
-type="tel"
-
 name="whatsapp"
 
 value={form.whatsapp}
 
 onChange={handleChange}
 
-placeholder="WhatsApp নম্বর"
+placeholder="WhatsApp Number"
 
 className="
 w-full
@@ -916,13 +908,12 @@ p-3
 
 
 
-{/* Contact Information */}
+{/* CONTACT */}
 
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
@@ -964,7 +955,6 @@ p-3
 
 
 
-
 <input
 
 name="facebook_link"
@@ -993,14 +983,12 @@ p-3
 
 
 
-{/* Academic Information */}
-
+{/* ACADEMIC */}
 
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
@@ -1016,6 +1004,8 @@ text-blue-700
 📚 শিক্ষাগত তথ্য
 
 </h2>
+
+
 
 
 
@@ -1091,11 +1081,11 @@ text-blue-700
 {form.batch}
 </b>
 
-
 </div>
 
-
 }
+
+
 
 
 
@@ -1110,13 +1100,7 @@ value={form.school}
 
 onChange={handleChange}
 
-placeholder={
-(form.class==="Class 11" || form.class==="Class 12")
-?
-"পূর্ববর্তী স্কুলের নাম"
-:
-"স্কুলের নাম"
-}
+placeholder="School Name"
 
 className="
 mb-4
@@ -1131,8 +1115,14 @@ p-3
 
 
 
+
 {
-(form.class==="Class 11" || form.class==="Class 12") &&
+
+(form.class==="Class 11" ||
+form.class==="Class 12")
+
+&&
+
 
 <input
 
@@ -1144,7 +1134,7 @@ value={form.college}
 
 onChange={handleChange}
 
-placeholder="কলেজের নাম"
+placeholder="College Name"
 
 className="
 w-full
@@ -1155,22 +1145,27 @@ p-3
 
 />
 
+
 }
+
+
 
 
 
 </div>
 
 
-{/* Address Information */}
+
+{/* ADDRESS */}
+
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
+
 
 <h2 className="
 mb-5
@@ -1182,6 +1177,8 @@ text-blue-700
 🏠 ঠিকানার তথ্য
 
 </h2>
+
+
 
 
 <textarea
@@ -1204,6 +1201,8 @@ p-3
 "
 
 />
+
+
 
 
 
@@ -1231,12 +1230,19 @@ p-3
 </div>
 
 
-{/* Payment Information */}
+
+
+
+
+
+
+{/* PAYMENT */}
+
+
 
 <div className="
 rounded-2xl
 border
-bg-white
 p-6
 shadow-sm
 ">
@@ -1252,6 +1258,7 @@ text-blue-700
 💳 পেমেন্ট তথ্য
 
 </h2>
+
 
 
 
@@ -1276,11 +1283,13 @@ p-3
 
 >
 
+
 <option value="">
 
 পেমেন্ট মাধ্যম নির্বাচন করুন
 
 </option>
+
 
 
 <option value="offline">
@@ -1290,11 +1299,13 @@ Offline Payment
 </option>
 
 
+
 <option value="bkash">
 
 bKash Payment
 
 </option>
+
 
 
 </select>
@@ -1303,11 +1314,17 @@ bKash Payment
 
 
 
+
+
 {
 
-form.payment_method==="bkash" &&
+form.payment_method==="bkash"
+
+&&
+
 
 <>
+
 
 <input
 
@@ -1334,6 +1351,7 @@ p-3
 
 
 
+
 <input
 
 required
@@ -1356,6 +1374,7 @@ p-3
 />
 
 
+
 </>
 
 
@@ -1364,9 +1383,16 @@ p-3
 
 
 
+
+
+
+
 {
 
-form.payment_method==="offline" &&
+form.payment_method==="offline"
+
+&&
+
 
 <div className="
 rounded-xl
@@ -1375,20 +1401,28 @@ p-4
 text-yellow-700
 ">
 
+
 অফলাইন পেমেন্ট নির্বাচিত হয়েছে।
-পেমেন্ট সম্পন্ন করার পর আবেদন যাচাই করা হবে।
+
+<br/>
+
+পেমেন্ট সম্পন্ন হওয়ার পর আবেদন যাচাই করা হবে।
+
 
 </div>
+
 
 }
 
 
 
-
-
-
-
 </div>
+
+
+
+
+
+
 
 
 
@@ -1403,12 +1437,13 @@ w-full
 rounded-xl
 bg-blue-600
 py-4
-text-white
 font-bold
+text-white
 hover:bg-blue-700
 "
 
 >
+
 
 {
 
@@ -1428,7 +1463,11 @@ loading
 </button>
 
 
+
+
+
 </form>
+
 
 
 </div>
