@@ -299,7 +299,9 @@ mx-auto
 <div className="
 bg-white
 rounded-3xl
-shadow-lg
+shadow-xl
+border
+border-gray-100
 p-5
 flex
 items-center
@@ -321,8 +323,9 @@ gap-4
 src="/logo.png"
 
 className="
-h-16
+h-20
 w-auto
+object-contain
 "
 
 />
@@ -484,9 +487,9 @@ color="purple"
 </div>
 
 
-// =====================
-// QUICK ACTIONS
-// =====================
+{/* =====================
+    QUICK ACTIONS
+===================== */}
 
 
 <h2 className="
@@ -661,7 +664,9 @@ return(
 <div className="
 bg-white
 rounded-3xl
-shadow-lg
+shadow-xl
+border
+border-gray-100
 p-6
 hover:shadow-xl
 transition
@@ -760,7 +765,9 @@ href={link}
 className="
 bg-white
 rounded-3xl
-shadow-lg
+shadow-xl
+border
+border-gray-100
 p-6
 hover:shadow-2xl
 hover:-translate-y-1
