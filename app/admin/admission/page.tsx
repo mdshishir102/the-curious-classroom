@@ -12,6 +12,8 @@ const [activeTab,setActiveTab] = useState("pending");
 
 const [loading,setLoading] = useState(true);
 
+const [selectedStudent,setSelectedStudent] = useState<any>(null);
+
 
 
 
@@ -752,15 +754,34 @@ shadow
 
 </div>
 
-// ======================
-// ACTION BUTTONS
-// ======================
 
+<button
+
+onClick={()=>setSelectedStudent(student)}
+
+className="
+mt-5
+rounded-xl
+bg-blue-600
+px-5
+py-3
+font-bold
+text-white
+"
+
+>
+
+👁 View Full Details
+
+</button>
+
+
+{/* ======================
+ACTION BUTTONS
+====================== */}
 
 {
-
 activeTab==="pending"
-
 &&
 
 
@@ -1015,6 +1036,602 @@ font-bold
 
 
 </div>
+
+
+
+
+{/* ==============================
+        STUDENT DETAILS MODAL
+================================ */}
+
+
+{
+
+selectedStudent &&
+
+
+<div
+
+className="
+fixed
+inset-0
+z-50
+flex
+items-center
+justify-center
+bg-black/60
+p-5
+"
+
+>
+
+
+<div
+
+className="
+max-h-[90vh]
+w-full
+max-w-5xl
+overflow-y-auto
+rounded-3xl
+bg-white
+p-8
+shadow-2xl
+"
+
+>
+
+
+{/* HEADER */}
+
+<div className="
+mb-8
+flex
+items-center
+justify-between
+border-b
+pb-5
+">
+
+
+<h2 className="
+text-3xl
+font-bold
+text-blue-700
+">
+
+🎓 Student Full Information
+
+</h2>
+
+
+
+<button
+
+onClick={()=>setSelectedStudent(null)}
+
+className="
+rounded-full
+bg-red-100
+px-4
+py-2
+font-bold
+text-red-600
+"
+
+>
+
+✕
+
+</button>
+
+
+</div>
+
+
+
+
+
+{/* TOP SECTION */}
+
+<div className="
+grid
+gap-8
+md:grid-cols-3
+">
+
+
+{/* PHOTO */}
+
+
+<div className="
+flex
+justify-center
+">
+
+
+<img
+
+src={selectedStudent.student_photo}
+
+alt={selectedStudent.student_name}
+
+className="
+h-64
+w-64
+rounded-3xl
+border-4
+border-blue-100
+object-cover
+shadow-xl
+"
+
+/>
+
+
+</div>
+
+
+
+
+
+{/* BASIC INFO */}
+
+<div className="
+md:col-span-2
+grid
+gap-3
+md:grid-cols-2
+">
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Name
+</p>
+
+<b>
+{selectedStudent.student_name}
+</b>
+
+</div>
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Student ID
+</p>
+
+<b>
+{
+selectedStudent.student_id || "Not Generated"
+}
+</b>
+
+</div>
+
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Class
+</p>
+
+<b>
+{selectedStudent.class}
+</b>
+
+</div>
+
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Batch
+</p>
+
+<b>
+{selectedStudent.batch}
+</b>
+
+</div>
+
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Guardian
+</p>
+
+<b>
+{selectedStudent.guardian_name}
+</b>
+
+</div>
+
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+WhatsApp
+</p>
+
+<b>
+{selectedStudent.whatsapp}
+</b>
+
+</div>
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+Date of Birth
+</p>
+
+<b>
+{selectedStudent.date_of_birth}
+</b>
+
+</div>
+
+
+
+<div className="rounded-xl bg-gray-50 p-4">
+
+<p className="text-gray-500">
+School
+</p>
+
+<b>
+{selectedStudent.school}
+</b>
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+{/* CONTACT */}
+
+<div className="
+mt-8
+rounded-2xl
+bg-blue-50
+p-6
+">
+
+
+<h3 className="
+mb-4
+text-xl
+font-bold
+text-blue-700
+">
+
+📞 Contact Information
+
+</h3>
+
+
+
+<p>
+<b>Email:</b> {selectedStudent.email || "N/A"}
+</p>
+
+
+
+<p className="mt-2">
+<b>Facebook:</b> {selectedStudent.facebook_link || "N/A"}
+</p>
+
+
+</div>
+
+
+
+
+
+
+{/* ADDRESS */}
+
+
+<div className="
+mt-6
+grid
+gap-5
+md:grid-cols-2
+">
+
+
+<div className="
+rounded-2xl
+border
+p-5
+">
+
+
+<h3 className="
+font-bold
+text-blue-700
+">
+
+🏠 Present Address
+
+</h3>
+
+
+<p className="mt-3">
+
+{
+selectedStudent.present_address || "N/A"
+}
+
+</p>
+
+
+</div>
+
+
+
+
+<div className="
+rounded-2xl
+border
+p-5
+">
+
+
+<h3 className="
+font-bold
+text-blue-700
+">
+
+🏠 Permanent Address
+
+</h3>
+
+
+<p className="mt-3">
+
+{
+selectedStudent.permanent_address || "N/A"
+}
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+{/* PAYMENT */}
+
+
+
+<div className="
+mt-6
+rounded-2xl
+border
+bg-yellow-50
+p-6
+">
+
+
+<h3 className="
+mb-4
+text-xl
+font-bold
+text-yellow-700
+">
+
+💳 Payment Information
+
+</h3>
+
+
+
+<p>
+
+Method:
+
+<b className="ml-2">
+
+{
+selectedStudent.payment_method==="bkash"
+?
+"bKash"
+:
+"Offline"
+}
+
+</b>
+
+</p>
+
+
+
+
+<p className="mt-3">
+
+Status:
+
+
+<b className="ml-2">
+
+
+{
+selectedStudent.payment_status==="paid"
+
+?
+
+<span className="text-green-600">
+PAID
+</span>
+
+:
+
+<span className="text-yellow-600">
+PENDING
+</span>
+
+}
+
+
+</b>
+
+
+</p>
+
+
+
+
+
+
+{
+
+selectedStudent.payment_method==="bkash"
+
+&&
+
+<>
+
+
+<p className="mt-3">
+
+bKash Number:
+
+<b>
+{selectedStudent.bkash_number}
+</b>
+
+</p>
+
+
+
+<p className="mt-3">
+
+Transaction ID:
+
+<b>
+{selectedStudent.transaction_id}
+</b>
+
+</p>
+
+
+</>
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+{/* LOGIN INFO */}
+
+
+{
+
+selectedStudent.status==="approved"
+
+&&
+
+
+<div className="
+mt-6
+rounded-2xl
+bg-green-50
+p-6
+">
+
+
+<h3 className="
+text-xl
+font-bold
+text-green-700
+">
+
+✅ Login Information
+
+</h3>
+
+
+<p className="mt-3">
+
+Student ID:
+
+<b>
+{selectedStudent.student_id}
+</b>
+
+</p>
+
+
+<p className="mt-3">
+
+Password:
+
+<b>
+{selectedStudent.password}
+</b>
+
+</p>
+
+
+
+</div>
+
+
+}
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+}
+
+
+
 
 
 </main>
