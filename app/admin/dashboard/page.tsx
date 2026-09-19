@@ -545,7 +545,17 @@ link="/admin/result"
 />
 
 
+<ActionCard
 
+icon="💳"
+
+title="Monthly Payment"
+
+desc="Manage student monthly payments"
+
+link="/admin/payment"
+
+/>
 
 
 <ActionCard
