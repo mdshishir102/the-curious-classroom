@@ -1110,6 +1110,9 @@ p-3
 />
 
 
+</div>
+
+
 {/* Payment Information */}
 
 <div className="
@@ -1263,7 +1266,7 @@ text-yellow-700
 
 
 
-</div>
+
 
 
 
