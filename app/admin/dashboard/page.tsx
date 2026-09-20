@@ -530,6 +530,18 @@ link="/admin"
 
 
 
+<ActionCard
+
+icon="💰"
+
+title="Fee Management"
+
+desc="Manage monthly fees"
+
+link="/admin/fee"
+
+/>
+
 
 
 <ActionCard
@@ -556,6 +568,21 @@ desc="Manage student monthly payments"
 link="/admin/payment"
 
 />
+
+
+<ActionCard
+
+icon="💰"
+
+title="Collection Dashboard"
+
+desc="View monthly payment collection"
+
+link="/admin/payment/dashboard"
+
+/>
+
+
 
 
 <ActionCard

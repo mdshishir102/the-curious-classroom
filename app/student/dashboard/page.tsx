@@ -3,6 +3,8 @@
 import {useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 import {supabase} from "@/lib/supabase";
+import jsPDF from "jspdf";
+
 
 
 export default function StudentDashboard(){
@@ -19,6 +21,8 @@ const [exams,setExams] = useState<any[]>([]);
 const [fees,setFees] = useState<any[]>([]);
 
 const [results,setResults] = useState<any[]>([]);
+
+const [discountFee,setDiscountFee] = useState<any>(null);
 
 const [loading,setLoading] = useState(true);
 
@@ -105,22 +109,50 @@ setExams(examData || []);
 
 
 
+const {data:paymentData}=await supabase
 
-const {data:feeData}=await supabase
-
-.from("fees")
+.from("payments")
 
 .select("*")
 
 .eq(
 "student_id",
 id
+)
+
+.order(
+"payment_date",
+{
+ascending:false
+}
 );
 
 
-setFees(feeData || []);
+
+setFees(paymentData || []);
 
 
+const {data:discountData}=await supabase
+
+.from("student_fee_settings")
+
+.select("*")
+
+.eq(
+"student_id",
+id
+)
+
+.eq(
+"academic_year",
+new Date().getFullYear()
+)
+
+.maybeSingle();
+
+
+
+setDiscountFee(discountData);
 
 
 
@@ -147,8 +179,127 @@ setLoading(false);
 }
 
 
+function downloadReceipt(payment:any){
 
 
+const doc = new jsPDF();
+
+
+
+doc.setFontSize(20);
+
+doc.text(
+"The Curious Classroom",
+20,
+25
+);
+
+
+
+doc.setFontSize(16);
+
+doc.text(
+"Monthly Fee Receipt",
+20,
+40
+);
+
+
+
+
+
+doc.setFontSize(12);
+
+
+doc.text(
+`Student Name: ${student.student_name}`,
+20,
+60
+);
+
+
+doc.text(
+`Student ID: ${student.student_id}`,
+20,
+70
+);
+
+
+doc.text(
+`Class: ${student.class}`,
+20,
+80
+);
+
+
+doc.text(
+`Batch: ${student.batch}`,
+20,
+90
+);
+
+
+
+
+doc.text(
+`Month: ${payment.month} ${payment.year}`,
+20,
+110
+);
+
+
+
+doc.text(
+`Amount: Tk ${payment.amount}`,
+20,
+120
+);
+
+
+
+doc.text(
+`Payment Method: ${payment.payment_method}`,
+20,
+130
+);
+
+
+
+doc.text(
+`Transaction ID: ${payment.transaction_id || "N/A"}`,
+20,
+140
+);
+
+
+
+doc.text(
+`Payment Date: ${
+new Date(payment.payment_date)
+.toLocaleString()
+}`,
+20,
+150
+);
+
+
+
+doc.text(
+"Status: PAID",
+20,
+160
+);
+
+
+
+doc.save(
+
+`TCCS_Fee_Receipt_${payment.month}_${payment.year}.pdf`
+
+);
+
+
+}
 
 
 function logout(){
@@ -911,15 +1062,120 @@ mt-2
 </div>
 
 
+{/* SPECIAL DISCOUNT */}
+
+{
+
+discountFee && (
+
+<div className="
+mt-8
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+">
+
+
+<h2 className="
+text-2xl
+font-bold
+text-orange-700
+mb-5
+">
+
+🎓 Special Fee Discount
+
+</h2>
+
+
+
+<div className="
+rounded-2xl
+bg-orange-50
+p-5
+">
+
+
+<p className="
+text-gray-600
+">
+
+Regular Monthly Fee
+
+</p>
+
+
+<p className="
+text-xl
+font-bold
+text-gray-800
+">
+
+৳ {student.class === "Class 9" ? "1500" : "N/A"}
+
+</p>
 
 
 
 
 
+<p className="
+mt-4
+text-gray-600
+">
 
-{/* FEE STATUS */}
+Your Discounted Fee
+
+</p>
 
 
+<p className="
+text-3xl
+font-bold
+text-green-700
+">
+
+৳ {discountFee.monthly_fee}
+
+</p>
+
+
+
+
+<p className="
+mt-4
+text-gray-600
+">
+
+Reason
+
+</p>
+
+
+<p className="
+font-bold
+text-orange-700
+">
+
+{discountFee.reason}
+
+</p>
+
+
+
+</div>
+
+
+
+</div>
+
+)
+
+}
+
+
+{/* MONTHLY PAYMENT OVERVIEW */}
 
 <div className="
 mt-8
@@ -937,129 +1193,155 @@ text-green-700
 mb-5
 ">
 
-💳 Fee Overview
+💳 Monthly Fee Overview
 
 </h2>
 
 
+{
+
+fees.length===0 ?
+
+<p className="
+text-gray-500
+">
+
+No payment history available
+
+</p>
+
+
+:
 
 
 <div className="
-grid
-md:grid-cols-2
-gap-5
+space-y-4
 ">
 
 
+{
 
-<div className="
+fees.map(payment=>(
+
+
+<div
+
+key={payment.id}
+
+className="
 rounded-2xl
 bg-green-50
-p-6
+p-5
+"
+
+
+>
+
+
+<h3 className="
+font-bold
+text-xl
+text-green-700
 ">
+
+{payment.month} {payment.year}
+
+</h3>
+
+
+
+<p>
+
+Amount:
+৳{payment.amount}
+
+</p>
+
+
+
+<p>
+
+Method:
+{payment.payment_method}
+
+</p>
+
+
+
+<p>
+
+Transaction:
+{payment.transaction_id || "N/A"}
+
+</p>
+
 
 
 <p className="
 text-gray-500
 ">
 
-Total Paid
-
-</p>
-
-
-<h3 className="
-text-3xl
-font-bold
-text-green-700
-mt-2
-">
-
-৳
+📅
 
 {
-
-fees
-
-.filter(
-fee=>fee.status==="paid"
-)
-
-.reduce(
-(sum,fee)=>
-sum+Number(fee.amount),
-0
-)
-
+new Date(payment.payment_date)
+.toLocaleString()
 }
 
-
-</h3>
-
-
-</div>
-
-
+</p>
 
 
 
 <div className="
-rounded-2xl
-bg-yellow-50
-p-6
-">
-
-
-<p className="
-text-gray-500
-">
-
-Total Due
-
-</p>
-
-
-<h3 className="
-text-3xl
+mt-3
+text-green-600
 font-bold
-text-yellow-700
-mt-2
 ">
 
-৳
+Paid ✅
 
-{
+</div>
 
-fees
 
-.filter(
-fee=>fee.status==="due"
-)
 
-.reduce(
-(sum,fee)=>
-sum+Number(fee.amount),
-0
-)
+<button
+
+onClick={()=>downloadReceipt(payment)}
+
+className="
+mt-4
+rounded-xl
+bg-blue-600
+px-5
+py-2
+text-white
+font-bold
+"
+
+>
+
+📄 Download Receipt
+
+</button>
+
+
+
+</div>
+
+
+))
+
 
 }
 
 
-</h3>
-
-
 </div>
 
 
-
-</div>
-
+}
 
 
 </div>
-
-
-
 
 
 

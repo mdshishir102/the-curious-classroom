@@ -1,6 +1,45 @@
+"use client";
+
+
+import {useEffect} from "react";
+import {useRouter} from "next/navigation";
+
+
+
 export default function StudentPage(){
 
-return (
+
+const router = useRouter();
+
+
+
+useEffect(()=>{
+
+
+const student = localStorage.getItem("student");
+
+
+if(student){
+
+router.push("/student/dashboard");
+
+}
+
+else{
+
+router.push("/student/login");
+
+}
+
+
+
+},[]);
+
+
+
+
+
+return(
 
 <main className="
 min-h-screen
@@ -10,18 +49,22 @@ justify-center
 bg-blue-50
 ">
 
+
 <h1 className="
-text-4xl
+text-3xl
 font-bold
 text-blue-600
 ">
 
-Student Page
+Loading Student Portal...
 
 </h1>
 
+
 </main>
 
+
 );
+
 
 }

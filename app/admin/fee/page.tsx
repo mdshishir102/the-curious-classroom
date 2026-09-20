@@ -1,33 +1,89 @@
 "use client";
 
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import {useEffect,useState} from "react";
+import {supabase} from "@/lib/supabase";
 
 
 
 export default function AdminFeePage(){
 
 
-const [students,setStudents] = useState<any[]>([]);
+const [fees,setFees]=useState<any[]>([]);
+
+const [students,setStudents]=useState<any[]>([]);
+
+const [loading,setLoading]=useState(true);
 
 
-const [studentId,setStudentId] = useState("");
-
-const [month,setMonth] = useState("");
-
-const [amount,setAmount] = useState("");
-
-const [status,setStatus] = useState("paid");
+const [academicYear,setAcademicYear]=useState(2026);
 
 
-const [loading,setLoading] = useState(false);
+const [selectedStudent,setSelectedStudent]=useState("");
+
+const [discountFee,setDiscountFee]=useState("");
+
+const [reason,setReason]=useState("");
 
 
 
 
 
-useEffect(()=>{
+
+
+async function loadFees(){
+
+
+setLoading(true);
+
+
+
+const {data,error}=await supabase
+
+.from("monthly_fee_settings")
+
+.select("*")
+
+.eq(
+"academic_year",
+academicYear
+)
+
+.order(
+"id",
+{
+ascending:true
+}
+
+);
+
+
+
+
+if(error){
+
+alert(error.message);
+
+setLoading(false);
+
+return;
+
+}
+
+
+
+setFees(data || []);
+
+setLoading(false);
+
+
+}
+
+
+
+
+
+
 
 
 async function loadStudents(){
@@ -53,13 +109,24 @@ setStudents(data || []);
 }
 
 
+
 }
 
+
+
+
+
+
+
+useEffect(()=>{
+
+
+loadFees();
 
 loadStudents();
 
 
-},[]);
+},[academicYear]);
 
 
 
@@ -67,14 +134,16 @@ loadStudents();
 
 
 
-async function saveFee(){
+
+
+async function saveDiscount(){
 
 
 
 if(
-!studentId ||
-!month ||
-!amount
+!selectedStudent ||
+!discountFee ||
+!reason
 ){
 
 alert("Fill all fields");
@@ -85,74 +154,31 @@ return;
 
 
 
-setLoading(true);
-
-
-
-
-
-// Duplicate Check
-
-
-const {data:existingFee}=
-
-await supabase
-
-.from("fees")
-
-.select("*")
-
-.eq(
-"student_id",
-studentId
-)
-
-.eq(
-"month",
-month
-)
-
-.maybeSingle();
-
-
-
-
-
-if(existingFee){
-
-
-alert(
-"This month fee already exists for this student"
-);
-
-
-setLoading(false);
-
-
-return;
-
-
-}
-
-
-
-
 
 
 
 const {error}=await supabase
 
-.from("fees")
+.from("student_fee_settings")
 
-.insert({
+.upsert({
 
-student_id:studentId,
 
-month:month,
+student_id:selectedStudent,
 
-amount:Number(amount),
 
-status:status
+academic_year:academicYear,
+
+
+monthly_fee:Number(discountFee),
+
+
+reason:reason,
+
+
+created_by:"admin"
+
+
 
 });
 
@@ -160,44 +186,31 @@ status:status
 
 
 
-if(error){
 
+
+if(error){
 
 alert(error.message);
 
-
-setLoading(false);
-
-
 return;
-
 
 }
 
 
 
 
-
-
 alert(
-"Fee Added Successfully"
+"Discount Saved Successfully"
 );
 
 
 
 
+setSelectedStudent("");
 
-setStudentId("");
+setDiscountFee("");
 
-setMonth("");
-
-setAmount("");
-
-setStatus("paid");
-
-
-
-setLoading(false);
+setReason("");
 
 
 
@@ -216,18 +229,18 @@ return(
 
 <main className="
 min-h-screen
-bg-gray-100
+bg-gradient-to-br
+from-blue-50
+via-white
+to-indigo-100
 p-8
 ">
 
 
+
 <div className="
+max-w-6xl
 mx-auto
-max-w-xl
-rounded-3xl
-bg-white
-p-8
-shadow
 ">
 
 
@@ -235,14 +248,296 @@ shadow
 
 
 <h1 className="
-text-3xl
+text-4xl
 font-bold
+text-gray-800
 ">
 
-Add Student Fee
+💰 Fee Management
 
 </h1>
 
+
+
+<p className="
+mt-2
+text-gray-500
+">
+
+Manage academic year wise monthly fees
+
+</p>
+
+
+
+
+
+
+
+{/* YEAR */}
+
+
+
+<div className="
+mt-8
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+">
+
+
+<h2 className="
+font-bold
+text-xl
+mb-4
+">
+
+Academic Year
+
+</h2>
+
+
+
+<select
+
+className="
+border
+rounded-xl
+p-3
+w-full
+md:w-64
+"
+
+value={academicYear}
+
+onChange={
+e=>
+setAcademicYear(
+Number(e.target.value)
+)
+}
+
+>
+
+
+<option value={2026}>
+2026
+</option>
+
+
+<option value={2027}>
+2027
+</option>
+
+
+</select>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+{/* FEE CARDS */}
+
+
+
+<div className="
+mt-8
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+{
+
+
+loading ?
+
+
+<p>
+Loading...
+</p>
+
+
+:
+
+
+fees.length===0 ?
+
+
+<div className="
+bg-white
+rounded-xl
+p-6
+">
+
+No Fee Setting Found
+
+</div>
+
+
+
+:
+
+
+fees.map(fee=>(
+
+
+<div
+
+key={fee.id}
+
+className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+"
+
+>
+
+
+<div className="
+flex
+justify-between
+">
+
+
+<h2 className="
+text-2xl
+font-bold
+text-blue-700
+">
+
+{fee.class_name}
+
+</h2>
+
+
+
+<span className="
+bg-green-100
+text-green-700
+px-4
+py-1
+rounded-full
+">
+
+{fee.academic_year}
+
+</span>
+
+
+</div>
+
+
+
+
+<div className="
+mt-5
+bg-blue-50
+rounded-xl
+p-5
+">
+
+
+<p>
+Monthly Fee
+</p>
+
+
+<h3 className="
+text-3xl
+font-bold
+text-blue-700
+">
+
+৳ {fee.amount}
+
+</h3>
+
+
+</div>
+
+
+
+
+<div className="
+mt-3
+bg-orange-50
+rounded-xl
+p-5
+">
+
+
+<p>
+Payment Due Date
+</p>
+
+
+<p className="
+font-bold
+text-orange-700
+">
+
+Every month {fee.due_date}th
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* DISCOUNT SECTION */}
+
+
+
+<div className="
+mt-10
+bg-white
+rounded-3xl
+shadow-lg
+p-8
+">
+
+
+<h2 className="
+text-2xl
+font-bold
+mb-5
+">
+
+🎓 Student Fee Discount
+
+</h2>
 
 
 
@@ -252,17 +547,20 @@ Add Student Fee
 <select
 
 className="
-mt-6
 w-full
-rounded-lg
 border
+rounded-xl
 p-3
+mb-4
 "
 
-value={studentId}
+value={selectedStudent}
 
 onChange={
-e=>setStudentId(e.target.value)
+e=>
+setSelectedStudent(
+e.target.value
+)
 }
 
 >
@@ -275,8 +573,8 @@ Select Student
 </option>
 
 
-
 {
+
 
 students.map(student=>(
 
@@ -285,15 +583,17 @@ students.map(student=>(
 
 key={student.id}
 
-value={student.student_id}
+value={student.id}
 
 >
+
 
 {student.student_name}
 
 -
 
 {student.student_id}
+
 
 
 </option>
@@ -314,95 +614,31 @@ value={student.student_id}
 
 
 
-
-<select
+<input
 
 className="
-mt-4
 w-full
-rounded-lg
 border
+rounded-xl
 p-3
+mb-4
 "
 
-value={month}
+type="number"
+
+placeholder="Discount Monthly Fee"
+
+value={discountFee}
 
 onChange={
-e=>setMonth(e.target.value)
+e=>
+setDiscountFee(
+e.target.value
+)
 }
 
->
 
-
-<option value="">
-
-Select Month
-
-</option>
-
-
-<option value="January">
-January
-</option>
-
-
-<option value="February">
-February
-</option>
-
-
-<option value="March">
-March
-</option>
-
-
-<option value="April">
-April
-</option>
-
-
-<option value="May">
-May
-</option>
-
-
-<option value="June">
-June
-</option>
-
-
-<option value="July">
-July
-</option>
-
-
-<option value="August">
-August
-</option>
-
-
-<option value="September">
-September
-</option>
-
-
-<option value="October">
-October
-</option>
-
-
-<option value="November">
-November
-</option>
-
-
-<option value="December">
-December
-</option>
-
-
-</select>
-
+/>
 
 
 
@@ -413,22 +649,24 @@ December
 <input
 
 className="
-mt-4
 w-full
-rounded-lg
 border
+rounded-xl
 p-3
+mb-4
 "
 
-placeholder="Amount"
+placeholder="Reason"
 
-type="number"
-
-value={amount}
+value={reason}
 
 onChange={
-e=>setAmount(e.target.value)
+e=>
+setReason(
+e.target.value
+)
 }
+
 
 />
 
@@ -438,83 +676,32 @@ e=>setAmount(e.target.value)
 
 
 
-<select
-
-className="
-mt-4
-w-full
-rounded-lg
-border
-p-3
-"
-
-value={status}
-
-onChange={
-e=>setStatus(e.target.value)
-}
-
->
-
-
-<option value="paid">
-
-Paid
-
-</option>
-
-
-<option value="due">
-
-Due
-
-</option>
-
-
-</select>
-
-
-
-
-
-
-
-
 <button
 
-onClick={saveFee}
-
-disabled={loading}
+onClick={saveDiscount}
 
 className="
-mt-6
 w-full
-rounded-lg
-bg-blue-600
-py-3
+bg-green-600
 text-white
+rounded-xl
+py-3
+font-bold
 "
 
 >
 
-
-{
-
-loading
-
-?
-
-"Saving..."
-
-:
-
-"Add Fee"
-
-}
-
-
+💾 Save Discount
 
 </button>
+
+
+
+
+
+</div>
+
+
 
 
 
