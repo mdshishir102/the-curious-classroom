@@ -147,37 +147,53 @@ return;
 
 
 
+const monthNumber =
+String(
+new Date(`${payment.month} 1`).getMonth()+1
+).padStart(2,"0");
+
+
+const receiptNumber =
+Math.floor(
+100000 + Math.random()*900000
+);
+
+
+const receiptId =
+`TCC-${payment.year}-${monthNumber}-${receiptNumber}`;
+
+
+
+
 const {error}=await supabase
 
 .from("payments")
 
-.insert({
 
+
+.insert({
 
 student_id:selectedStudent.id,
 
-
 month:payment.month,
-
 
 year:Number(payment.year),
 
-
 amount:Number(payment.amount),
-
 
 payment_method:payment.payment_method,
 
-
 transaction_id:payment.transaction_id,
 
+status:"paid",
 
-status:"paid"
+receipt_id:receiptId,
 
+receipt_status:"active",
+
+generated_at:new Date()
 
 });
-
-
 
 
 
