@@ -1,9 +1,7 @@
 "use client";
 
-
-import {useEffect,useState} from "react";
-import {supabase} from "@/lib/supabase";
-
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 
 export default function AdminFeePage(){
@@ -13,10 +11,24 @@ const [fees,setFees]=useState<any[]>([]);
 
 const [students,setStudents]=useState<any[]>([]);
 
+const [dueStudents,setDueStudents]=useState<any[]>([]);
+
+
 const [loading,setLoading]=useState(true);
 
 
 const [academicYear,setAcademicYear]=useState(2026);
+
+
+const [selectedMonth,setSelectedMonth]=useState(
+new Date().toLocaleString(
+"en-US",
+{
+month:"long"
+}
+)
+);
+
 
 
 const [selectedStudent,setSelectedStudent]=useState("");
@@ -37,7 +49,6 @@ async function loadFees(){
 setLoading(true);
 
 
-
 const {data,error}=await supabase
 
 .from("monthly_fee_settings")
@@ -54,9 +65,7 @@ academicYear
 {
 ascending:true
 }
-
 );
-
 
 
 
@@ -71,13 +80,13 @@ return;
 }
 
 
-
 setFees(data || []);
 
 setLoading(false);
 
 
 }
+
 
 
 
@@ -109,8 +118,141 @@ setStudents(data || []);
 }
 
 
+}
+
+
+
+
+
+
+
+
+
+async function loadDueStudents(){
+
+
+
+const {data:allStudents,error}=await supabase
+
+.from("students")
+
+.select("*")
+
+.eq(
+"status",
+"approved"
+);
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
 
 }
+
+
+
+const studentIds =
+allStudents?.map(
+student=>student.id
+) || [];
+
+
+
+
+const {data:payments}=await supabase
+
+.from("payments")
+
+.select("student_id")
+
+.in(
+"student_id",
+studentIds
+)
+
+.eq(
+"month",
+selectedMonth
+)
+
+.eq(
+"year",
+academicYear
+)
+
+.eq(
+"status",
+"paid"
+);
+
+
+
+
+
+const paidIds = new Set(
+
+payments?.map(
+payment=>payment.student_id
+)
+
+);
+
+
+
+
+const dueList = allStudents?.filter(student=>{
+
+
+// Admission date check
+
+const admissionDate = new Date(
+student.admission_date
+);
+
+
+
+const selectedDate = new Date(
+`${selectedMonth} 1, ${academicYear}`
+);
+
+
+
+
+// Admission এর আগের মাস হলে দেখাবে না
+
+if(admissionDate > selectedDate){
+
+return false;
+
+}
+
+
+
+// Payment check
+
+return !paidIds.has(student.id);
+
+
+
+});
+
+
+
+
+
+
+setDueStudents(
+dueList || []
+);
+
+
+}
+
+
 
 
 
@@ -125,9 +267,13 @@ loadFees();
 
 loadStudents();
 
+loadDueStudents();
 
-},[academicYear]);
 
+},[
+academicYear,
+selectedMonth
+]);
 
 
 
@@ -137,7 +283,6 @@ loadStudents();
 
 
 async function saveDiscount(){
-
 
 
 if(
@@ -154,36 +299,23 @@ return;
 
 
 
-
-
-
 const {error}=await supabase
 
 .from("student_fee_settings")
 
 .upsert({
 
-
 student_id:selectedStudent,
-
 
 academic_year:academicYear,
 
-
 monthly_fee:Number(discountFee),
-
 
 reason:reason,
 
-
 created_by:"admin"
 
-
-
 });
-
-
-
 
 
 
@@ -198,11 +330,9 @@ return;
 
 
 
-
 alert(
 "Discount Saved Successfully"
 );
-
 
 
 
@@ -219,6 +349,61 @@ setReason("");
 
 
 
+function sendWhatsApp(student:any){
+
+
+const message =
+
+`আসসালামু আলাইকুম।
+
+সম্মানিত অভিভাবক,
+
+আশা করি আপনারা ভালো আছেন।
+
+শিক্ষার্থীদের নিয়মিত ক্লাস ও একাডেমিক কার্যক্রমের ধারাবাহিকতা বজায় রাখার স্বার্থে মাসিক ফি সংক্রান্ত একটি বিষয়ে আপনাদের অবগত করা যাচ্ছে।
+
+আপনার সন্তান ${student.student_name}-এর ${selectedMonth} মাসের মাসিক ফি এখনো পরিশোধ করা হয়নি।
+
+শিক্ষার্থী: ${student.student_name}
+শ্রেণি: ${student.class}
+বকেয়া মাস: ${selectedMonth} ${academicYear}
+
+অনুগ্রহ করে আগামী ১৫ তারিখের মধ্যে বকেয়া মাসিক ফি পরিশোধ করে শিক্ষার্থীর নিয়মিত পড়াশোনার কার্যক্রম অব্যাহত রাখতে সহযোগিতা করবেন।
+
+নির্ধারিত সময়ের মধ্যে ফি পরিশোধ না হলে প্রতিষ্ঠানের নিয়ম অনুযায়ী শিক্ষার্থীর ভর্তি সাময়িকভাবে স্থগিত হতে পারে। পরবর্তীতে পুনরায় ভর্তি কার্যক্রম চালু করতে নির্ধারিত পুনঃভর্তি ফি প্রযোজ্য হবে।
+
+আপনাদের সহযোগিতা ও আন্তরিকতার জন্য আন্তরিক ধন্যবাদ।
+
+শুভেচ্ছান্তে,
+
+শিশির স্যার
+Biology Teacher
+The Curious Classroom`;
+
+
+
+
+const phone =
+
+student.whatsapp.replace(
+/[^0-9]/g,
+""
+);
+
+
+
+window.open(
+
+`https://wa.me/88${phone}?text=${encodeURIComponent(message)}`,
+
+"_blank"
+
+);
+
+
+}
+
+
 
 
 
@@ -226,25 +411,28 @@ setReason("");
 
 return(
 
-
 <main className="
 min-h-screen
-bg-gradient-to-br
-from-blue-50
-via-white
-to-indigo-100
-p-8
+bg-slate-50
+p-6
+md:p-10
 ">
 
 
-
 <div className="
-max-w-6xl
+max-w-7xl
 mx-auto
 ">
 
 
+{/* HEADER */}
 
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+">
 
 
 <h1 className="
@@ -258,24 +446,23 @@ text-gray-800
 </h1>
 
 
-
 <p className="
 mt-2
 text-gray-500
 ">
 
-Manage academic year wise monthly fees
+Manage fees, payments and pending collections
 
 </p>
 
 
+</div>
 
 
 
 
 
-{/* YEAR */}
-
+{/* FILTER */}
 
 
 <div className="
@@ -287,16 +474,23 @@ p-6
 ">
 
 
-<h2 className="
+<div className="
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+<div>
+
+<p className="
 font-bold
-text-xl
-mb-4
+mb-2
 ">
 
 Academic Year
 
-</h2>
-
+</p>
 
 
 <select
@@ -306,20 +500,17 @@ border
 rounded-xl
 p-3
 w-full
-md:w-64
 "
 
 value={academicYear}
 
 onChange={
-e=>
-setAcademicYear(
+e=>setAcademicYear(
 Number(e.target.value)
 )
 }
 
 >
-
 
 <option value={2026}>
 2026
@@ -334,6 +525,83 @@ Number(e.target.value)
 </select>
 
 
+</div>
+
+
+
+
+
+
+<div>
+
+<p className="
+font-bold
+mb-2
+">
+
+Payment Month
+
+</p>
+
+
+
+<select
+
+className="
+border
+rounded-xl
+p-3
+w-full
+"
+
+value={selectedMonth}
+
+onChange={
+e=>setSelectedMonth(
+e.target.value
+)
+}
+
+>
+
+
+{
+
+[
+"January",
+"February",
+"March",
+"April",
+"May",
+"June",
+"July",
+"August",
+"September",
+"October",
+"November",
+"December"
+
+].map(month=>(
+
+<option key={month}>
+
+{month}
+
+</option>
+
+))
+
+}
+
+
+</select>
+
+
+</div>
+
+
+</div>
+
 
 </div>
 
@@ -344,8 +612,8 @@ Number(e.target.value)
 
 
 
-{/* FEE CARDS */}
 
+{/* FEE SETTINGS */}
 
 
 <div className="
@@ -358,31 +626,18 @@ gap-6
 
 {
 
-
 loading ?
-
-
-<p>
-Loading...
-</p>
-
-
-:
-
-
-fees.length===0 ?
 
 
 <div className="
 bg-white
-rounded-xl
+rounded-3xl
 p-6
 ">
 
-No Fee Setting Found
+Loading...
 
 </div>
-
 
 
 :
@@ -408,6 +663,7 @@ p-6
 <div className="
 flex
 justify-between
+items-center
 ">
 
 
@@ -422,13 +678,13 @@ text-blue-700
 </h2>
 
 
-
 <span className="
-bg-green-100
-text-green-700
+bg-blue-100
+text-blue-700
 px-4
-py-1
+py-2
 rounded-full
+font-bold
 ">
 
 {fee.academic_year}
@@ -441,16 +697,21 @@ rounded-full
 
 
 
+
 <div className="
 mt-5
 bg-blue-50
-rounded-xl
+rounded-2xl
 p-5
 ">
 
 
-<p>
+<p className="
+text-gray-500
+">
+
 Monthly Fee
+
 </p>
 
 
@@ -470,16 +731,19 @@ text-blue-700
 
 
 
+
 <div className="
-mt-3
+mt-4
 bg-orange-50
-rounded-xl
+rounded-2xl
 p-5
 ">
 
 
 <p>
+
 Payment Due Date
+
 </p>
 
 
@@ -494,7 +758,6 @@ Every month {fee.due_date}th
 
 
 </div>
-
 
 
 </div>
@@ -515,13 +778,255 @@ Every month {fee.due_date}th
 
 
 
+{/* PENDING SECTION */}
 
-{/* DISCOUNT SECTION */}
+
+<div className="
+mt-12
+">
+
+
+<div className="
+flex
+justify-between
+items-center
+mb-6
+">
+
+
+<h2 className="
+text-3xl
+font-bold
+text-gray-800
+">
+
+⚠️ Pending Fee Collection
+
+</h2>
+
+
+<span className="
+bg-red-100
+text-red-700
+px-4
+py-2
+rounded-full
+font-bold
+">
+
+{selectedMonth} {academicYear}
+
+</span>
+
+
+</div>
+
+
+
+
+
+{
+["Class 9","Class 10","Class 11","Class 12"]
+
+.map(className=>{
+
+
+const classStudents =
+dueStudents.filter(
+student=>student.class===className
+);
+
+
+
+if(classStudents.length===0)
+return null;
+
+
+
+return(
+
+<div
+
+key={className}
+
+className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+mb-6
+"
+
+>
+
+
+<h3 className="
+text-2xl
+font-bold
+text-blue-700
+mb-5
+">
+
+🎓 {className}
+
+</h3>
 
 
 
 <div className="
-mt-10
+grid
+md:grid-cols-2
+gap-5
+">
+
+
+{
+
+classStudents.map(student=>(
+
+
+<div
+
+key={student.id}
+
+className="
+border
+rounded-2xl
+p-5
+"
+
+>
+
+
+<div className="
+flex
+justify-between
+">
+
+
+<div>
+
+
+<h4 className="
+font-bold
+text-xl
+">
+
+{student.student_name}
+
+</h4>
+
+
+<p>
+ID: {student.student_id}
+</p>
+
+
+</div>
+
+
+
+<span className="
+bg-red-100
+text-red-700
+px-3
+py-1
+rounded-full
+font-bold
+">
+
+DUE
+
+</span>
+
+
+</div>
+
+
+
+
+<div className="
+mt-4
+bg-orange-50
+rounded-xl
+p-4
+">
+
+
+<p>
+Due Month
+</p>
+
+
+<p className="
+font-bold
+text-orange-700
+">
+
+{selectedMonth} {academicYear}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<button
+
+onClick={()=>sendWhatsApp(student)}
+
+className="
+mt-4
+w-full
+bg-green-600
+text-white
+rounded-xl
+py-3
+font-bold
+"
+
+>
+
+💬 WhatsApp Reminder
+
+</button>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+</div>
+
+
+)
+
+
+})
+
+
+}
+
+
+</div>
+
+
+{/* DISCOUNT SECTION */}
+
+
+<div className="
+mt-12
 bg-white
 rounded-3xl
 shadow-lg
@@ -543,7 +1048,6 @@ mb-5
 
 
 
-
 <select
 
 className="
@@ -557,8 +1061,7 @@ mb-4
 value={selectedStudent}
 
 onChange={
-e=>
-setSelectedStudent(
+e=>setSelectedStudent(
 e.target.value
 )
 }
@@ -573,8 +1076,8 @@ Select Student
 </option>
 
 
-{
 
+{
 
 students.map(student=>(
 
@@ -587,14 +1090,10 @@ value={student.id}
 
 >
 
-
 {student.student_name}
 
 -
-
 {student.student_id}
-
-
 
 </option>
 
@@ -631,12 +1130,10 @@ placeholder="Discount Monthly Fee"
 value={discountFee}
 
 onChange={
-e=>
-setDiscountFee(
+e=>setDiscountFee(
 e.target.value
 )
 }
-
 
 />
 
@@ -661,12 +1158,10 @@ placeholder="Reason"
 value={reason}
 
 onChange={
-e=>
-setReason(
+e=>setReason(
 e.target.value
 )
 }
-
 
 />
 
@@ -683,6 +1178,7 @@ onClick={saveDiscount}
 className="
 w-full
 bg-green-600
+hover:bg-green-700
 text-white
 rounded-xl
 py-3
@@ -698,10 +1194,7 @@ font-bold
 
 
 
-
 </div>
-
-
 
 
 
@@ -716,6 +1209,5 @@ font-bold
 
 
 )
-
 
 }

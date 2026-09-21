@@ -19,6 +19,23 @@ params.className as string
 
 
 
+const months = [
+"January",
+"February",
+"March",
+"April",
+"May",
+"June",
+"July",
+"August",
+"September",
+"October",
+"November",
+"December"
+];
+
+
+
 const [students,setStudents] = useState<any[]>([]);
 
 const [loading,setLoading] = useState(true);
@@ -26,13 +43,21 @@ const [loading,setLoading] = useState(true);
 
 const [selectedStudent,setSelectedStudent] = useState<any>(null);
 
+
 const [showModal,setShowModal] = useState(false);
+
+
+const [paidMonths,setPaidMonths] = useState<string[]>([]);
+
+
+const [availableMonths,setAvailableMonths] = useState<string[]>([]);
 
 
 
 const [payment,setPayment] = useState({
 
 month:"",
+
 year:new Date().getFullYear(),
 
 amount:"",
@@ -42,7 +67,6 @@ payment_method:"",
 transaction_id:""
 
 });
-
 
 
 
@@ -102,8 +126,6 @@ setLoading(false);
 
 
 
-
-
 useEffect(()=>{
 
 
@@ -111,7 +133,6 @@ loadStudents();
 
 
 },[]);
-
 
 
 
@@ -143,10 +164,6 @@ return;
 
 }
 
-
-
-
-
 const monthNumber =
 String(
 new Date(`${payment.month} 1`).getMonth()+1
@@ -165,35 +182,92 @@ const receiptId =
 
 
 
+const {data: existingPayment} = await supabase
+
+.from("payments")
+
+.select("id")
+
+.eq(
+"student_id",
+selectedStudent.id
+)
+
+.eq(
+"month",
+payment.month
+)
+
+.eq(
+"year",
+Number(payment.year)
+)
+
+.limit(1);
+
+
+
+
+
+if(
+existingPayment &&
+existingPayment.length > 0
+){
+
+alert(
+`${payment.month} ${payment.year} payment already completed`
+);
+
+return;
+
+}
+
+
+
+
+
+
+
 const {error}=await supabase
 
 .from("payments")
 
-
-
 .insert({
+
 
 student_id:selectedStudent.id,
 
+
 month:payment.month,
+
 
 year:Number(payment.year),
 
+
 amount:Number(payment.amount),
+
 
 payment_method:payment.payment_method,
 
+
 transaction_id:payment.transaction_id,
+
 
 status:"paid",
 
+
 receipt_id:receiptId,
+
 
 receipt_status:"active",
 
+
 generated_at:new Date()
 
+
 });
+
+
 
 
 
@@ -202,6 +276,7 @@ if(error){
 
 
 alert(error.message);
+
 
 return;
 
@@ -213,15 +288,20 @@ return;
 
 
 
-alert("Payment Added Successfully");
+alert(
+"Payment Added Successfully"
+);
+
+
 
 
 
 setShowModal(false);
 
 
-
 setSelectedStudent(null);
+
+
 
 
 
@@ -243,12 +323,7 @@ transaction_id:""
 
 }
 
-
-
-
-
 return(
-
 
 <main className="
 min-h-screen
@@ -260,12 +335,10 @@ p-8
 ">
 
 
-
 <div className="
 max-w-6xl
 mx-auto
 ">
-
 
 
 <h1 className="
@@ -277,7 +350,6 @@ text-gray-800
 💳 {className} Payment Management
 
 </h1>
-
 
 
 <p className="
@@ -314,6 +386,7 @@ space-y-5
 
 
 {
+
 students.map(student=>(
 
 
@@ -386,13 +459,91 @@ gap-3
 
 <button
 
-onClick={()=>{
+onClick={async()=>{
+
 
 setSelectedStudent(student);
 
+
+
+const {data}=await supabase
+
+.from("payments")
+
+.select("month")
+
+.eq(
+"student_id",
+student.id
+)
+
+.eq(
+"year",
+new Date().getFullYear()
+);
+
+
+
+setPaidMonths(
+
+data?.map(
+item=>item.month
+)
+
+|| []
+
+);
+
+
+
+
+// admission month filter
+
+const admissionMonth =
+
+new Date(
+student.admission_date
+)
+
+.getMonth();
+
+
+
+
+setAvailableMonths(
+
+months.filter(
+(month,index)=>{
+
+return index >= admissionMonth;
+
+}
+
+)
+
+);
+
+
+
+
+
+
+setPayment({
+
+...payment,
+
+month:""
+
+});
+
+
+
 setShowModal(true);
 
+
+
 }}
+
 
 className="
 rounded-xl
@@ -456,7 +607,15 @@ font-bold
 }
 
 
+
+
+
+
+
+
+
 {/* PAYMENT MODAL */}
+
 
 {
 
@@ -487,7 +646,6 @@ shadow-2xl
 <h2 className="
 text-2xl
 font-bold
-text-gray-800
 mb-5
 ">
 
@@ -498,15 +656,16 @@ Add Monthly Payment
 
 
 <p className="
-mb-5
 text-blue-700
 font-bold
+mb-5
 ">
 
 Student:
 {selectedStudent?.student_name}
 
 </p>
+
 
 
 
@@ -524,13 +683,15 @@ mb-4
 
 value={payment.month}
 
-onChange={(e)=>setPayment({
+onChange={
+e=>setPayment({
 
 ...payment,
 
 month:e.target.value
 
-})}
+})
+}
 
 >
 
@@ -542,64 +703,32 @@ Select Month
 </option>
 
 
-<option>
-January
+
+{
+
+availableMonths.map(month=>(
+
+
+<option
+
+key={month}
+
+disabled={
+paidMonths.includes(month)
+}
+
+>
+
+{month}
+
 </option>
 
 
-<option>
-February
-</option>
+))
 
 
-<option>
-March
-</option>
+}
 
-
-<option>
-April
-</option>
-
-
-<option>
-May
-</option>
-
-
-<option>
-June
-</option>
-
-
-<option>
-July
-</option>
-
-
-<option>
-August
-</option>
-
-
-<option>
-September
-</option>
-
-
-<option>
-October
-</option>
-
-
-<option>
-November
-</option>
-
-
-<option>
-December
-</option>
 
 
 </select>
@@ -626,16 +755,17 @@ placeholder="Amount"
 
 value={payment.amount}
 
-onChange={(e)=>setPayment({
+onChange={
+e=>setPayment({
 
 ...payment,
 
 amount:e.target.value
 
-})}
+})
+}
 
 />
-
 
 
 
@@ -652,18 +782,17 @@ p-3
 mb-4
 "
 
-
 value={payment.payment_method}
 
-
-onChange={(e)=>setPayment({
+onChange={
+e=>setPayment({
 
 ...payment,
 
 payment_method:e.target.value
 
-})}
-
+})
+}
 
 >
 
@@ -718,18 +847,21 @@ placeholder="Transaction ID"
 
 value={payment.transaction_id}
 
-onChange={(e)=>setPayment({
+onChange={
+e=>setPayment({
 
 ...payment,
 
 transaction_id:e.target.value
 
-})}
+})
+}
 
 />
 
 
 }
+
 
 
 
@@ -749,8 +881,8 @@ onClick={()=>setShowModal(false)}
 
 className="
 flex-1
-rounded-xl
 bg-gray-300
+rounded-xl
 py-3
 font-bold
 "
@@ -771,10 +903,10 @@ onClick={addPayment}
 
 className="
 flex-1
-rounded-xl
 bg-blue-600
-py-3
 text-white
+rounded-xl
+py-3
 font-bold
 "
 
@@ -790,8 +922,6 @@ Save Payment
 
 
 
-
-
 </div>
 
 
@@ -802,7 +932,6 @@ Save Payment
 
 
 }
-
 
 
 

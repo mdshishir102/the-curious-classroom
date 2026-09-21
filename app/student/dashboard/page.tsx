@@ -4,6 +4,7 @@ import {useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 import {supabase} from "@/lib/supabase";
 import jsPDF from "jspdf";
+import QRCode from "qrcode";
 
 
 
@@ -179,14 +180,28 @@ setLoading(false);
 }
 
 
-function downloadReceipt(payment:any){
+
+async function downloadReceipt(payment:any){
 
 
 const doc = new jsPDF();
 
 
 
-doc.setFontSize(20);
+const verifyUrl =
+`https://thecuriousclassroom.vercel.app/student/verify?receipt=${payment.receipt_id}`;
+
+
+const qrImage = await QRCode.toDataURL(
+verifyUrl
+);
+
+
+
+
+// HEADER
+
+doc.setFontSize(22);
 
 doc.text(
 "The Curious Classroom",
@@ -196,10 +211,10 @@ doc.text(
 
 
 
-doc.setFontSize(16);
+doc.setFontSize(15);
 
 doc.text(
-"Monthly Fee Receipt",
+"OFFICIAL DIGITAL PAYMENT RECEIPT",
 20,
 40
 );
@@ -207,42 +222,51 @@ doc.text(
 
 
 
+// RECEIPT INFO
+
 
 doc.setFontSize(12);
 
 
 doc.text(
-`Student Name: ${student.student_name}`,
+`Receipt ID: ${payment.receipt_id || "N/A"}`,
 20,
 60
 );
 
 
+
 doc.text(
-`Student ID: ${student.student_id}`,
+`Generated: ${new Date().toLocaleString()}`,
 20,
 70
 );
 
 
-doc.text(
-`Class: ${student.class}`,
-20,
-80
-);
+
+
+
+// STUDENT INFO
 
 
 doc.text(
-`Batch: ${student.batch}`,
+`Student Name: ${student.student_name}`,
 20,
 90
 );
 
 
 
+doc.text(
+`Student ID: ${student.student_id}`,
+20,
+100
+);
+
+
 
 doc.text(
-`Month: ${payment.month} ${payment.year}`,
+`Class: ${student.class}`,
 20,
 110
 );
@@ -250,23 +274,20 @@ doc.text(
 
 
 doc.text(
-`Amount: Tk ${payment.amount}`,
+`Batch: ${student.batch}`,
 20,
 120
 );
 
 
 
-doc.text(
-`Payment Method: ${payment.payment_method}`,
-20,
-130
-);
 
+
+// PAYMENT INFO
 
 
 doc.text(
-`Transaction ID: ${payment.transaction_id || "N/A"}`,
+`Month: ${payment.month} ${payment.year}`,
 20,
 140
 );
@@ -274,10 +295,7 @@ doc.text(
 
 
 doc.text(
-`Payment Date: ${
-new Date(payment.payment_date)
-.toLocaleString()
-}`,
+`Amount: Tk ${payment.amount}`,
 20,
 150
 );
@@ -285,18 +303,75 @@ new Date(payment.payment_date)
 
 
 doc.text(
-"Status: PAID",
+`Payment Method: ${payment.payment_method}`,
 20,
 160
 );
 
 
 
+doc.text(
+`Transaction ID: ${payment.transaction_id || "N/A"}`,
+20,
+170
+);
+
+
+
+doc.text(
+`Payment Status: ${payment.status}`,
+20,
+180
+);
+
+
+
+
+
+
+// QR
+
+
+doc.text(
+"Scan To Verify Receipt",
+20,
+205
+);
+
+
+
+doc.addImage(
+qrImage,
+"PNG",
+20,
+215,
+45,
+45
+);
+
+
+
+
+
+doc.setFontSize(9);
+
+
+doc.text(
+verifyUrl,
+20,
+270
+);
+
+
+
+
+
 doc.save(
 
-`TCCS_Fee_Receipt_${payment.month}_${payment.year}.pdf`
+`TCCS_Receipt_${payment.receipt_id}.pdf`
 
 );
+
 
 
 }
@@ -790,7 +865,13 @@ Result
 
 
 
-<div className="
+
+
+<div
+
+onClick={()=>router.push("/student/payment")}
+
+className="
 bg-white
 rounded-3xl
 shadow
@@ -798,7 +879,12 @@ p-6
 text-center
 hover:shadow-xl
 transition
-">
+cursor-pointer
+hover:scale-105
+"
+
+>
+
 
 <div className="
 text-4xl
@@ -819,7 +905,22 @@ Payment
 </h3>
 
 
+<p className="
+text-sm
+text-gray-500
+mt-2
+">
+
+View payment history
+
+</p>
+
+
 </div>
+
+
+
+
 
 
 

@@ -516,18 +516,6 @@ md:grid-cols-3
 
 
 
-<ActionCard
-
-icon="📥"
-
-title="Pending Admission"
-
-desc="Manage new admissions"
-
-link="/admin"
-
-/>
-
 
 
 <ActionCard
