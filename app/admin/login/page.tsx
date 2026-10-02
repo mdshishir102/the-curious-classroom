@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { Eye, EyeOff } from "lucide-react";
 
 
 
@@ -16,6 +17,8 @@ const router = useRouter();
 const [email,setEmail] = useState("");
 
 const [password,setPassword] = useState("");
+
+const [showPassword,setShowPassword] = useState(false);
 
 const [loading,setLoading] = useState(false);
 
@@ -303,17 +306,19 @@ e=>setEmail(e.target.value)
 
 
 
+<div className="relative mt-4">
+
 <input
 
 className="
-mt-4
 w-full
 rounded-lg
 border
 p-3
+pr-12
 "
 
-type="password"
+type={showPassword ? "text" : "password"}
 
 placeholder="Password"
 
@@ -324,6 +329,36 @@ e=>setPassword(e.target.value)
 }
 
 />
+
+
+<button
+
+type="button"
+
+onClick={() => setShowPassword(!showPassword)}
+
+className="
+absolute
+right-3
+top-1/2
+-translate-y-1/2
+text-gray-500
+"
+
+>
+
+{
+showPassword
+?
+<EyeOff size={20}/>
+:
+<Eye size={20}/>
+}
+
+</button>
+
+
+</div>
 
 
 
