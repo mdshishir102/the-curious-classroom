@@ -210,10 +210,13 @@ pb-8
 
 <img
 
-src={
-student.student_photo ||
-"/logo.png"
-}
+src={student.student_photo}
+
+onError={(e)=>{
+
+e.currentTarget.src="/logo.png";
+
+}}
 
 className="
 h-40
@@ -226,6 +229,8 @@ shadow
 "
 
 />
+
+
 
 
 

@@ -778,22 +778,14 @@ justify-center
 
 <img
 
-src={student.student_photo}
 
+src={decodeURIComponent(student.student_photo)}
 alt={student.student_name}
-
-className="
-h-52
-w-52
-rounded-3xl
-object-cover
-border-4
-border-blue-100
-shadow
-"
-
+className="h-52 w-52 rounded-3xl object-cover border-4 border-blue-100 shadow"
+onError={(e)=>{
+  e.currentTarget.src="/placeholder.png";
+}}
 />
-
 
 </div>
 
@@ -1198,21 +1190,12 @@ justify-center
 
 
 <img
-
-src={selectedStudent.student_photo}
-
+src={decodeURIComponent(selectedStudent.student_photo)}
 alt={selectedStudent.student_name}
-
-className="
-h-64
-w-64
-rounded-3xl
-border-4
-border-blue-100
-object-cover
-shadow-xl
-"
-
+className="h-64 w-64 rounded-3xl border-4 border-blue-100 object-cover shadow-xl"
+onError={(e)=>{
+  e.currentTarget.src="/placeholder.png";
+}}
 />
 
 

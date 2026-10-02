@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 
@@ -11,676 +9,235 @@ export default function ManageResultPage() {
 const router = useRouter();
 
 
-const [results,setResults] = useState<any[]>([]);
-
-const [students,setStudents] = useState<any[]>([]);
-
-const [filteredResults,setFilteredResults] = useState<any[]>([]);
-
-const [selectedStudent,setSelectedStudent] = useState("");
-
-const [subject,setSubject] = useState("");
-
-const [examType,setExamType] = useState("");
-
-const [loading,setLoading] = useState(true);
-
-
-
-
-
-async function loadResults(){
-
-
-const {data,error}=await supabase
-
-.from("results")
-
-.select("*")
-
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-
-
-if(!error){
-
-setResults(data || []);
-
-setFilteredResults(data || []);
-
-}
-
-
-setLoading(false);
-
-
-}
-
-
-
-
-
-
-
-async function loadStudents(){
-
-
-const {data,error}=await supabase
-
-.from("students")
-
-.select("*")
-
-.eq(
-"status",
-"approved"
-);
-
-
-
-if(!error){
-
-setStudents(data || []);
-
-}
-
-
-}
-
-
-
-
-
-
-
-useEffect(()=>{
-
-
-loadResults();
-
-loadStudents();
-
-
-},[]);
-
-
-
-
-
-
-
-function filterResults(){
-
-
-let data=[...results];
-
-
-
-if(selectedStudent){
-
-data=data.filter(
-
-item=>
-
-item.student_id===selectedStudent
-
-);
-
-}
-
-
-
-if(subject){
-
-data=data.filter(
-
-item=>
-
-item.subject===subject
-
-);
-
-}
-
-
-
-if(examType){
-
-data=data.filter(
-
-item=>
-
-item.exam_type===examType
-
-);
-
-}
-
-
-
-setFilteredResults(data);
-
-
-}
-
-
-
-
-
-
-useEffect(()=>{
-
-
-filterResults();
-
-
-},[
-selectedStudent,
-subject,
-examType,
-results
-]);
-
-
-
-
-
-
-
-const subjects=[
-
-...new Set(
-results.map(
-item=>item.subject
-)
-)
-
+const classes = [
+  {
+    name:"Class 9",
+    icon:"📘",
+    color:"from-blue-500 to-cyan-400",
+    shadow:"shadow-blue-200"
+  },
+  {
+    name:"Class 10",
+    icon:"📗",
+    color:"from-green-500 to-emerald-400",
+    shadow:"shadow-green-200"
+  },
+  {
+    name:"Class 11",
+    icon:"📕",
+    color:"from-purple-500 to-violet-400",
+    shadow:"shadow-purple-200"
+  },
+  {
+    name:"Class 12",
+    icon:"📙",
+    color:"from-orange-500 to-amber-400",
+    shadow:"shadow-orange-200"
+  }
 ];
 
 
 
 
-const examTypes=[
-
-...new Set(
-results.map(
-item=>item.exam_type
-)
-)
-
-];
-
-
-
-
-
-
-
-return(
-
+return (
 
 <main className="
 min-h-screen
-bg-gray-100
+bg-gradient-to-br
+from-slate-100
+via-blue-50
+to-white
 p-8
 ">
 
 
 <div className="
 mx-auto
-max-w-6xl
+max-w-7xl
 ">
 
+
+{/* Header */}
+
+<div className="
+mb-12
+">
 
 
 <h1 className="
-mb-8
-text-3xl
-font-bold
+text-4xl
+font-extrabold
+tracking-tight
+text-gray-800
 ">
 
-Result Management
+📊 Manage Result
 
 </h1>
 
 
-
-
-
-<div className="
-mb-8
-grid
-gap-4
-rounded-2xl
-bg-white
-p-6
-md:grid-cols-3
+<p className="
+mt-3
+text-gray-500
+text-lg
 ">
 
+Select a class to manage student examination results
 
-
-
-
-<select
-
-className="
-rounded-lg
-border
-p-3
-"
-
-value={selectedStudent}
-
-onChange={
-e=>setSelectedStudent(e.target.value)
-}
-
->
-
-<option value="">
-
-All Students
-
-</option>
-
-
-{
-
-students.map(student=>(
-
-
-<option
-
-key={student.id}
-
-value={student.student_id}
-
->
-
-{student.student_name}
-
--
-{student.student_id}
-
-</option>
-
-
-))
-
-}
-
-
-</select>
-
-
-
-
-
-
-
-
-<select
-
-className="
-rounded-lg
-border
-p-3
-"
-
-value={subject}
-
-onChange={
-e=>setSubject(e.target.value)
-}
-
->
-
-<option value="">
-
-All Subjects
-
-</option>
-
-
-{
-
-subjects.map(item=>(
-
-
-<option key={item}>
-
-{item}
-
-</option>
-
-
-))
-
-}
-
-
-</select>
-
-
-
-
-
-
-
-<select
-
-className="
-rounded-lg
-border
-p-3
-"
-
-value={examType}
-
-onChange={
-e=>setExamType(e.target.value)
-}
-
->
-
-<option value="">
-
-All Exam Types
-
-</option>
-
-
-
-{
-
-examTypes.map(item=>(
-
-
-<option key={item}>
-
-{item}
-
-</option>
-
-
-))
-
-}
-
-
-
-</select>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-{
-
-loading ?
-
-
-<p>
-Loading...
 </p>
 
 
-:
-
-
-filteredResults.length===0 ?
-
-
-<div className="
-rounded-xl
-bg-white
-p-6
-">
-
-No Result Found
-
 </div>
 
 
-:
 
+
+
+{/* Cards */}
 
 <div className="
-space-y-5
+grid
+gap-8
+sm:grid-cols-2
+lg:grid-cols-4
 ">
+
 
 
 {
 
-filteredResults.map(result=>(
+classes.map((item)=>(
 
 
 <div
 
-key={result.id}
+key={item.name}
 
-className="
-rounded-2xl
+onClick={()=>router.push(
+`/admin/result/manage/${item.name.replace(" ","-")}`
+)}
+
+className={`
+group
+relative
+cursor-pointer
+overflow-hidden
+rounded-3xl
 bg-white
-p-6
-shadow
-"
+p-7
+shadow-xl
+${item.shadow}
+transition-all
+duration-300
+hover:-translate-y-2
+hover:shadow-2xl
+`}
+
 
 >
 
 
+{/* Gradient Top */}
+
+<div className={`
+absolute
+left-0
+top-0
+h-2
+w-full
+bg-gradient-to-r
+${item.color}
+`}>
+</div>
+
+
+
+
+
 <div className="
-flex
-justify-between
-items-center
+relative
 ">
 
 
-<div>
+{/* Icon */}
+
+<div className={`
+mb-6
+flex
+h-20
+w-20
+items-center
+justify-center
+rounded-3xl
+bg-gradient-to-br
+${item.color}
+text-4xl
+shadow-lg
+transition
+duration-300
+group-hover:scale-110
+`}>
+
+{item.icon}
+
+</div>
+
+
+
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
+text-gray-800
 ">
 
-{
-
-students.find(
-
-student=>
-
-student.student_id===result.student_id
-
-)?.student_name
-
-||
-
-"Unknown Student"
-
-}
+{item.name}
 
 </h2>
 
 
 
-<p className="text-gray-500">
+<p className="
+mt-3
+text-sm
+leading-6
+text-gray-500
+">
 
-{result.student_id}
-
-</p>
-
-
-
-<p>
-
-Subject: {result.subject}
+Manage {item.name} students result, marks and performance.
 
 </p>
-
-
-
-<p>
-
-Exam: {result.exam_type}
-
-</p>
-
-
-</div>
 
 
 
 
 
 <div className="
-text-right
-">
-
-
-<p className="
-text-xl
-font-bold
+mt-8
+flex
+items-center
+font-semibold
 text-blue-600
 ">
 
-{result.marks}/{result.total_marks}
 
-</p>
+Open Result
 
 
-<p className="
-font-bold
-text-green-600
+<span className="
+ml-2
+transition
+duration-300
+group-hover:translate-x-2
 ">
 
-{result.grade}
+→
 
-</p>
-
-
-<p>
-
-{result.percentage}%
-
-</p>
+</span>
 
 
 </div>
-
-
-
-</div>
-
-
-
-
-
-
-<div className="
-mt-5
-flex
-gap-4
-">
-
-
-<button
-
-onClick={()=>
-
-
-router.push(
-
-`/admin/result/manage/edit/${result.id}`
-
-)
-
-}
-
-className="
-rounded-lg
-bg-yellow-500
-px-5
-py-2
-text-white
-"
-
->
-
-Edit
-
-</button>
-
-
-
-
-
-
-
-<button
-
-onClick={async()=>{
-
-
-const ok=confirm(
-"Delete this result?"
-);
-
-
-
-if(!ok)
-return;
-
-
-
-const {error}=await supabase
-
-.from("results")
-
-.delete()
-
-.eq(
-"id",
-result.id
-);
-
-
-
-if(!error){
-
-loadResults();
-
-}
-
-
-
-}}
-
-className="
-rounded-lg
-bg-red-600
-px-5
-py-2
-text-white
-"
-
->
-
-Delete
-
-</button>
 
 
 
@@ -697,19 +254,17 @@ Delete
 }
 
 
-</div>
-
-
-}
-
 
 </div>
+
+
+
+</div>
+
 
 
 </main>
 
-
 )
-
 
 }

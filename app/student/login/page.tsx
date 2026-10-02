@@ -19,6 +19,7 @@ const [password,setPassword] = useState("");
 
 const [loading,setLoading] = useState(false);
 
+const [showPassword, setShowPassword] = useState(false);
 
 
 
@@ -117,6 +118,12 @@ JSON.stringify(studentData)
 
 );
 
+localStorage.setItem(
+"student_id",
+studentData.student_id
+);
+
+
 
 
 
@@ -125,13 +132,16 @@ JSON.stringify(studentData)
 
 // Go student dashboard
 
-
-router.push(
-
+window.history.replaceState(
+null,
+"",
 "/student/dashboard"
-
 );
 
+
+router.replace(
+"/student/dashboard"
+);
 
 
 
@@ -264,37 +274,54 @@ e=>setStudentID(e.target.value)
 
 
 
+<div className="relative mt-4">
+
 <input
 
-
 className="
-mt-4
 w-full
 rounded-lg
 border
 p-3
+pr-12
 text-gray-900
 "
 
-
 placeholder="Password"
 
-
-type="password"
-
+type={showPassword ? "text" : "password"}
 
 value={password}
 
-
 onChange={
-
 e=>setPassword(e.target.value)
-
 }
-
 
 />
 
+
+<button
+
+type="button"
+
+onClick={()=>setShowPassword(!showPassword)}
+
+className="
+absolute
+right-3
+top-1/2
+-translate-y-1/2
+text-gray-500
+"
+
+>
+
+{showPassword ? "🙈" : "👁️"}
+
+</button>
+
+
+</div>
 
 
 

@@ -400,8 +400,9 @@ return;
 
       grade:grade,
 
-      comment:form.comment
+      comment:form.comment,
 
+      position:form.position
 
     });
 
@@ -439,7 +440,9 @@ chapter:"",
 marks:"",
 total_marks:"",
 
-comment:""
+comment:"",
+
+position:""
 
 });
 
@@ -815,7 +818,28 @@ Grade:
         />
 
 
+<input
 
+className="
+mt-4
+w-full
+rounded-lg
+border
+p-3
+"
+
+placeholder="Position"
+
+value={form.position}
+
+onChange={(e)=>
+setForm({
+...form,
+position:e.target.value
+})
+}
+
+/>
 
 
 

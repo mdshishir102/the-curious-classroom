@@ -336,10 +336,17 @@ items-center
 <img
 
 src={
-student.student_photo
-||
-"/logo.png"
+student.student_photo?.trim()
 }
+
+onError={(e)=>{
+
+console.log(
+"IMAGE FAILED:",
+student.student_photo
+);
+
+}}
 
 className="
 h-24

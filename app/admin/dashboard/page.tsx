@@ -518,32 +518,6 @@ md:grid-cols-3
 
 
 
-<ActionCard
-
-icon="💰"
-
-title="Fee Management"
-
-desc="Manage monthly fees"
-
-link="/admin/fee"
-
-/>
-
-
-
-<ActionCard
-
-icon="📝"
-
-title="Add Result"
-
-desc="Create student result"
-
-link="/admin/result"
-
-/>
-
 
 <ActionCard
 
@@ -585,6 +559,82 @@ link="/admin/result/manage"
 
 />
 
+
+
+
+<ActionCard
+
+icon="✅"
+
+title="Attendance Management"
+
+desc="Manage student attendance"
+
+link="/admin/attendance"
+
+/>
+
+
+
+<ActionCard
+
+icon="📚"
+
+title="Class Notes"
+
+desc="Manage class notes & marked books"
+
+link="/admin/notes"
+
+/>
+
+
+
+
+
+<ActionCard
+
+icon="🤖"
+
+title="AI Question Generator"
+
+desc="Generate Biology MCQ, SAQ & CQ"
+
+link="/admin/biology/ai-generator"
+
+/>
+
+
+
+
+
+<ActionCard
+
+icon="🧬"
+
+title="Chapter Management"
+
+desc="Manage Biology chapters & AI content"
+
+link="/admin/biology/chapters"
+
+/>
+
+
+
+
+
+<ActionCard
+
+icon="🕒"
+
+title="Class Time Management"
+
+desc="Manage class schedules"
+
+link="/admin/schedule"
+
+/>
 
 
 

@@ -158,192 +158,418 @@ setLoading(false);
 
 
 
-
-
-
-
-
-
 async function downloadReceipt(payment:any){
-
-
 
 const doc = new jsPDF();
 
 
-
+// ==========================
+// VERIFY URL
+// ==========================
 
 const verifyUrl =
-
 `https://thecuriousclassroom.vercel.app/student/verify?receipt=${payment.receipt_id}`;
 
 
 
+// ==========================
+// QR CODE
+// ==========================
 
 const qrImage = await QRCode.toDataURL(
-
 verifyUrl
+);
 
+
+
+// ==========================
+// WATERMARK
+// ==========================
+
+const watermark = new Image();
+
+watermark.src="/logo.png";
+
+
+await new Promise((resolve)=>{
+watermark.onload = resolve;
+});
+
+
+
+const canvas = document.createElement("canvas");
+
+canvas.width = watermark.width;
+canvas.height = watermark.height;
+
+
+const ctx = canvas.getContext("2d");
+
+
+if(ctx){
+
+ctx.globalAlpha = 0.10;
+
+ctx.drawImage(
+watermark,
+0,
+0
+);
+
+}
+
+
+const watermarkData =
+canvas.toDataURL("image/png");
+
+
+
+const watermarkWidth = 170;
+
+
+const watermarkHeight =
+(watermark.height / watermark.width)
+*
+watermarkWidth;
+
+
+
+doc.addImage(
+watermarkData,
+"PNG",
+20,
+105,
+watermarkWidth,
+watermarkHeight
 );
 
 
 
 
+
+
+// ==========================
+// HEADER
+// ==========================
+
+
+doc.setFont(
+"helvetica",
+"bold"
+);
 
 
 doc.setFontSize(22);
 
 
 doc.text(
-
 "The Curious Classroom",
-
-20,
-
-25
-
+105,
+35,
+{
+align:"center"
+}
 );
 
 
 
+doc.setFont(
+"helvetica",
+"normal"
+);
 
 
-
-doc.setFontSize(15);
+doc.setFontSize(10);
 
 
 doc.text(
+"Academic Excellence Through Curiosity",
+105,
+43,
+{
+align:"center"
+}
+);
 
+
+
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+
+doc.setFontSize(14);
+
+
+doc.text(
 "OFFICIAL PAYMENT RECEIPT",
-
-20,
-
-40
-
+105,
+56,
+{
+align:"center"
+}
 );
 
 
 
 
+// ==========================
+// RECEIPT INFO
+// ==========================
 
+
+doc.roundedRect(
+15,
+68,
+180,
+28,
+4,
+4
+);
+
+
+
+doc.setFontSize(10);
+
+
+
+doc.text(
+`Receipt ID : ${payment.receipt_id || "N/A"}`,
+25,
+80
+);
+
+
+
+doc.text(
+`Generated : ${new Date().toLocaleString()}`,
+25,
+88
+);
+
+
+
+doc.text(
+"Status : PAID",
+155,
+80
+);
+
+
+
+
+// ==========================
+// STUDENT INFORMATION
+// ==========================
 
 
 doc.setFontSize(12);
 
 
-
 doc.text(
-
-`Receipt ID: ${payment.receipt_id || "N/A"}`,
-
-20,
-
-60
-
+"Student Information",
+15,
+110
 );
 
 
 
-
-
-doc.text(
-
-`Student: ${student.student_name}`,
-
-20,
-
-80
-
+doc.roundedRect(
+15,
+118,
+180,
+50,
+4,
+4
 );
 
 
 
-
-
-doc.text(
-
-`Student ID: ${student.student_id}`,
-
-20,
-
-90
-
-);
-
-
+doc.setFontSize(10);
 
 
 
 doc.text(
-
-`Class: ${student.class}`,
-
-20,
-
-100
-
-);
-
-
-
-
-
-doc.text(
-
-`Month: ${payment.month} ${payment.year}`,
-
-20,
-
-120
-
-);
-
-
-
-
-
-doc.text(
-
-`Amount: Tk ${payment.amount}`,
-
-20,
-
+`Student Name        : ${student.student_name}`,
+25,
 130
-
 );
-
-
 
 
 
 doc.text(
-
-`Method: ${payment.payment_method}`,
-
-20,
-
+`Student ID          : ${student.student_id}`,
+25,
 140
+);
 
+
+
+doc.text(
+`Class               : ${student.class}`,
+25,
+150
+);
+
+
+
+doc.text(
+`Batch               : ${student.batch}`,
+25,
+160
 );
 
 
 
 
+
+
+// ==========================
+// PAYMENT DETAILS
+// ==========================
+
+
+doc.setFontSize(12);
+
+
+doc.text(
+"Payment Details",
+15,
+180
+);
+
+
+
+doc.roundedRect(
+15,
+188,
+180,
+50,
+4,
+4
+);
+
+
+
+doc.setFontSize(10);
+
+
+
+doc.text(
+`Payment Month       : ${payment.month} ${payment.year}`,
+25,
+200
+);
+
+
+
+doc.text(
+`Amount              : Tk ${payment.amount}`,
+25,
+210
+);
+
+
+
+doc.text(
+`Payment Method      : ${payment.payment_method}`,
+25,
+220
+);
+
+
+
+doc.text(
+`Transaction ID      : ${payment.transaction_id || "N/A"}`,
+25,
+230
+);
+
+
+
+
+// QR
 
 doc.addImage(
-
 qrImage,
-
 "PNG",
+150,
+193,
+32,
+32
+);
 
-20,
 
-170,
 
-45,
+doc.setFontSize(8);
 
-45
 
+doc.text(
+"Scan to verify receipt",
+166,
+230,
+{
+align:"center"
+}
+);
+
+
+
+
+
+
+// ==========================
+// FOOTER
+// ==========================
+
+
+doc.setFontSize(9);
+
+
+doc.text(
+"This is a digitally generated payment receipt.",
+105,
+245,
+{
+align:"center"
+}
+);
+
+
+
+doc.setFontSize(10);
+
+
+
+doc.text(
+"Authorized by",
+15,
+260
+);
+
+
+
+doc.text(
+"MD. Mahfuz Shaharia Shishir",
+15,
+270
+);
+
+
+
+doc.text(
+"CEO & Founder",
+15,
+280
+);
+
+
+
+doc.text(
+"The Curious Classroom",
+15,
+285
 );
 
 
@@ -351,14 +577,19 @@ qrImage,
 
 
 doc.save(
-
 `Receipt-${payment.receipt_id}.pdf`
-
 );
 
 
-
 }
+
+
+
+
+
+
+
+
 
 
 if(loading){
@@ -781,7 +1012,7 @@ Your monthly fee payment is pending.
 
 <a
 
-href="tel:+881346071073"
+href="tel:+8801346071073"
 
 className="
 inline-block
