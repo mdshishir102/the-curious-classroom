@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import SiteShell from "@/components/SiteShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,16 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Curious Classroom | Explore • Learn • Understand",
+  title: {
+    default: "The Curious Classroom | Shishir BioVerse",
+    template: "%s | The Curious Classroom",
+  },
   description:
-    "The Curious Classroom explains science, technology, history and fascinating ideas through simple and engaging content.",
+    "The Curious Classroom-এর জীববিজ্ঞান বিভাগ Shishir BioVerse। শিশিরের সরাসরি দিকনির্দেশনায় SSC ও HSC জীববিজ্ঞানের অফলাইন ক্লাস, নিয়মিত অনুশীলন ও পরীক্ষার প্রস্তুতি।",
   verification: {
     google: "ZhbYuxL7znnBk3uGPO5aagRt-LcQ2FbqrNiljZuyK80",
   },
   openGraph: {
-    title: "The Curious Classroom | Explore • Learn • Understand",
+    title: "The Curious Classroom | Shishir BioVerse",
     description:
-      "Explore science, technology, history and fascinating ideas through simple and engaging content.",
+      "শিশিরের সঙ্গে বুঝে শেখো জীববিজ্ঞান। নবম–দ্বাদশ শ্রেণির জন্য SSC ও HSC জীববিজ্ঞানের অফলাইন ব্যাচ।",
+    siteName: "The Curious Classroom",
+    locale: "bn_BD",
+    type: "website",
     images: ["/og-image.png"],
   },
 };
@@ -31,18 +39,17 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html
-      lang="en"
+      lang="bn"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
+      <body className="flex min-h-full flex-col">
+        <SiteShell>{children}</SiteShell>
+        <GoogleAnalytics gaId="G-X51ZCDCKNZ" />
       </body>
-
-      <GoogleAnalytics gaId="G-X51ZCDCKNZ" />
     </html>
   );
 }

@@ -3,29 +3,15 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Quote, UserRound } from "lucide-react";
 
-const reviews = [
-  {
-    id: "review-1",
-    name: "শিক্ষার্থীর নাম",
-    studentClass: "HSC শিক্ষার্থী",
-    text: "The Curious Classroom-এর সহজবোধ্য পড়ানোর পদ্ধতি এবং নিয়মিত গাইডলাইন আমাকে আত্মবিশ্বাসের সঙ্গে পরীক্ষার প্রস্তুতি নিতে সাহায্য করেছে।",
-    isSample: true,
-  },
-  {
-    id: "review-2",
-    name: "শিক্ষার্থীর নাম",
-    studentClass: "SSC শিক্ষার্থী",
-    text: "নিয়মিত পরীক্ষা, মূল্যায়ন এবং শিক্ষকদের সহযোগিতার মাধ্যমে আমার পড়াশোনার উন্নতি হয়েছে।",
-    isSample: true,
-  },
-  {
-    id: "review-3",
-    name: "শিক্ষার্থীর নাম",
-    studentClass: "HSC শিক্ষার্থী",
-    text: "কঠিন বিষয়গুলো সহজভাবে বোঝানোর কারণে পড়াশোনার প্রতি আগ্রহ ও আত্মবিশ্বাস দুটোই বেড়েছে।",
-    isSample: true,
-  },
-];
+type StudentReview = {
+  id: string;
+  name: string;
+  studentClass: string;
+  text: string;
+};
+
+// শিক্ষার্থীর অনুমতি নিয়ে তার আসল মতামত এখানে যোগ করবে।
+const reviews: StudentReview[] = [];
 
 export default function StudentSuccess() {
   const reduceMotion = useReducedMotion();
@@ -40,6 +26,17 @@ export default function StudentSuccess() {
     transition: { duration: reduceMotion ? 0 : 0.5 },
   };
 
+  if (reviews.length === 0) {
+    return null;
+  }
+
+  const gridClass =
+    reviews.length === 1
+      ? "mx-auto max-w-2xl"
+      : reviews.length === 2
+        ? "mx-auto max-w-5xl md:grid-cols-2"
+        : "md:grid-cols-2 lg:grid-cols-3";
+
   return (
     <section
       aria-labelledby="student-stories-heading"
@@ -52,7 +49,7 @@ export default function StudentSuccess() {
           className="mx-auto max-w-2xl text-center"
         >
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-blue-300">
-            Student Perspectives
+            SHISHIR BioVerse
           </p>
 
           <h2
@@ -63,36 +60,30 @@ export default function StudentSuccess() {
           </h2>
 
           <p className="mt-4 text-base leading-8 text-slate-300">
-            শেখার পথচলা, পরীক্ষার প্রস্তুতি ও আত্মবিশ্বাস—
-            শিক্ষার্থীদের নিজের কথায়।
+            শিশিরের সঙ্গে জীববিজ্ঞান শেখা ও পরীক্ষার
+            প্রস্তুতির অভিজ্ঞতা—শিক্ষার্থীদের নিজের কথায়।
           </p>
         </motion.div>
 
         {/* Reviews */}
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:mt-12 lg:grid-cols-3">
+        <div
+          className={`mt-10 grid gap-6 lg:mt-12 ${gridClass}`}
+        >
           {reviews.map((review) => (
             <motion.figure
               key={review.id}
               {...reveal}
               className="flex h-full flex-col rounded-2xl border border-white/10 bg-[#101A2C] p-6 sm:p-8"
             >
-              <div className="flex items-center justify-between gap-4">
-                <Quote
-                  aria-hidden="true"
-                  size={32}
-                  strokeWidth={1.4}
-                  className="text-blue-400"
-                />
-
-                {review.isSample && (
-                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs leading-5 text-slate-400">
-                    নমুনা মতামত
-                  </span>
-                )}
-              </div>
+              <Quote
+                aria-hidden="true"
+                size={32}
+                strokeWidth={1.4}
+                className="text-blue-400"
+              />
 
               <blockquote className="mb-8 mt-6 flex-1">
-                <p className="text-base leading-8 text-slate-200">
+                <p className="whitespace-pre-line text-base leading-8 text-slate-200">
                   {review.text}
                 </p>
               </blockquote>
@@ -110,10 +101,8 @@ export default function StudentSuccess() {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="font-medium leading-7 text-white">
-                    {review.isSample
-                      ? "নমুনা শিক্ষার্থী পরিচিতি"
-                      : review.name}
+                  <p className="break-words font-medium leading-7 text-white">
+                    {review.name}
                   </p>
 
                   <p className="mt-0.5 text-sm leading-6 text-blue-300">
