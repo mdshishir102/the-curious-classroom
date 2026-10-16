@@ -144,7 +144,7 @@ export async function GET() {
       ];
     });
 
-    return NextResponse.json(videos.slice(0, 3));
+return NextResponse.json(videos.slice(0, 4));
   } catch {
     return NextResponse.json(
       { error: "Unable to load YouTube videos right now." },

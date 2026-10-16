@@ -48,6 +48,13 @@ const initialForm = {
   rules_accept: false,
 };
 
+const classOptions = [
+  { value: "Class 9", label: "নবম শ্রেণি" },
+  { value: "Class 10", label: "দশম শ্রেণি" },
+  { value: "Class 11", label: "একাদশ শ্রেণি" },
+  { value: "Class 12", label: "দ্বাদশ শ্রেণি" },
+];
+
 const rules = [
   {
     title: "১. নিয়মিত উপস্থিতির নিয়ম",
@@ -121,6 +128,7 @@ function FormSection({
         >
           {number}
         </span>
+
         <h2
           id={`section-${number}`}
           className="text-xl font-semibold text-white"
@@ -149,7 +157,9 @@ export default function AdmissionForm() {
   const isHsc =
     form.class === "Class 11" || form.class === "Class 12";
 
-  // Release the preview URL when the photo changes.
+  const selectedClassLabel =
+    classOptions.find((item) => item.value === form.class)?.label;
+
   useEffect(() => {
     if (!photo) {
       setPhotoPreview("");
@@ -158,15 +168,16 @@ export default function AdmissionForm() {
 
     const url = URL.createObjectURL(photo);
     setPhotoPreview(url);
+
     return () => URL.revokeObjectURL(url);
   }, [photo]);
 
-  // Native dialog provides keyboard focus management.
   useEffect(() => {
     const dialog = rulesDialogRef.current;
 
     if (showRules) {
       if (dialog && !dialog.open) dialog.showModal();
+
       const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
 
@@ -282,6 +293,7 @@ export default function AdmissionForm() {
     }
 
     const paid = Number(form.admission_fee_paid);
+
     if (!Number.isFinite(paid) || paid < 0) {
       setError("প্রদত্ত ভর্তি ফির সঠিক পরিমাণ লিখুন।");
       return;
@@ -338,7 +350,7 @@ export default function AdmissionForm() {
       window.scrollTo({ top: 0, behavior: "auto" });
     } catch {
       setError(
-        "আবেদন জমা দেওয়া যায়নি। আপনার তথ্য রাখা আছে—কিছুক্ষণ পর আবার চেষ্টা করুন।"
+        "আবেদন জমা দেওয়া যায়নি। আপনার পূরণ করা তথ্য ফর্মে আছে—কিছুক্ষণ পর আবার চেষ্টা করুন।"
       );
     } finally {
       submittingRef.current = false;
@@ -359,13 +371,21 @@ export default function AdmissionForm() {
             strokeWidth={1.5}
             className="mx-auto text-blue-400"
           />
-          <h1 className="mt-6 text-3xl font-semibold">
+
+          <p className="mt-6 text-sm font-medium text-blue-300">
+            SHISHIR BioVerse
+          </p>
+
+          <h1 className="mt-3 text-3xl font-semibold">
             আবেদন জমা হয়েছে
           </h1>
+
           <p className="mt-5 leading-8 text-slate-300">
-            আপনার ভর্তি আবেদনটি গ্রহণ করা হয়েছে।
-            আমাদের টিম আপনার তথ্য যাচাই করবে।
+            Shishir BioVerse-এর অফলাইন জীববিজ্ঞান ব্যাচে
+            আপনার ভর্তি আবেদন জমা হয়েছে। তথ্য ও পেমেন্ট
+            যাচাইয়ের পর ভর্তি নিশ্চিত করা হবে।
           </p>
+
           <Link
             href="/"
             className={`mt-8 inline-flex items-center gap-3 rounded-xl bg-blue-600 px-6 py-3.5 font-medium hover:bg-blue-500 ${focusClass}`}
@@ -410,17 +430,39 @@ export default function AdmissionForm() {
         </div>
 
         <header className="mb-9 mt-10 lg:mt-14">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-300">
-            Begin Your Learning Journey
+          <p className="text-lg font-medium text-blue-200">
+            <span className="font-bold tracking-[0.12em]">
+              SHISHIR
+            </span>{" "}
+            BioVerse
           </p>
-          <h1 className="mt-4 text-3xl font-semibold sm:text-4xl">
-            ভর্তি আবেদন
+
+          <h1 className="mt-4 text-3xl font-semibold leading-snug sm:text-4xl">
+            অফলাইন ব্যাচে ভর্তি আবেদন
           </h1>
+
           <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300">
-            The Curious Classroom-এর সঙ্গে শিক্ষার নতুন যাত্রা
-            শুরু করুন। নিচের তথ্যগুলো সঠিকভাবে পূরণ করুন।
+            শিশিরের সরাসরি দিকনির্দেশনায় SSC ও HSC জীববিজ্ঞান
+            শেখার শুরু হোক এখান থেকেই। আবেদন করতে নিচের
+            তথ্যগুলো সঠিকভাবে পূরণ করুন।
           </p>
-          <p className="mt-3 text-sm text-slate-400">
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {[
+              "SSC ও HSC",
+              "জীববিজ্ঞান",
+              "অফলাইন ক্লাস",
+            ].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-blue-400/15 bg-blue-400/5 px-3 py-1.5 text-xs leading-6 text-blue-200"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          <p className="mt-5 text-sm text-slate-400">
             <span className="text-blue-300">*</span> চিহ্নিত তথ্য আবশ্যক।
           </p>
         </header>
@@ -436,7 +478,11 @@ export default function AdmissionForm() {
               <div className="min-w-0 space-y-6">
                 <FormSection number="01" title="শিক্ষার্থীর তথ্য">
                   <div className="grid gap-5 sm:grid-cols-2">
-                    <Field id="student_name" label="শিক্ষার্থীর নাম" required>
+                    <Field
+                      id="student_name"
+                      label="শিক্ষার্থীর নাম"
+                      required
+                    >
                       <input
                         id="student_name"
                         name="student_name"
@@ -448,7 +494,11 @@ export default function AdmissionForm() {
                       />
                     </Field>
 
-                    <Field id="date_of_birth" label="জন্ম তারিখ" required>
+                    <Field
+                      id="date_of_birth"
+                      label="জন্ম তারিখ"
+                      required
+                    >
                       <input
                         id="date_of_birth"
                         name="date_of_birth"
@@ -461,7 +511,11 @@ export default function AdmissionForm() {
                     </Field>
 
                     <div className="sm:col-span-2">
-                      <Field id="student_photo" label="শিক্ষার্থীর ছবি" required>
+                      <Field
+                        id="student_photo"
+                        label="শিক্ষার্থীর ছবি"
+                        required
+                      >
                         <div className="rounded-xl border border-dashed border-blue-400/30 bg-[#0A1220] p-4 sm:p-5">
                           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                             <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5">
@@ -485,6 +539,7 @@ export default function AdmissionForm() {
                               <p className="mb-3 text-sm leading-6 text-slate-400">
                                 শিক্ষার্থীর পরিষ্কার ছবি নির্বাচন করুন।
                               </p>
+
                               <input
                                 id="student_photo"
                                 type="file"
@@ -505,7 +560,11 @@ export default function AdmissionForm() {
 
                 <FormSection number="02" title="অভিভাবকের তথ্য">
                   <div className="grid gap-5 sm:grid-cols-2">
-                    <Field id="guardian_name" label="অভিভাবকের নাম" required>
+                    <Field
+                      id="guardian_name"
+                      label="অভিভাবকের নাম"
+                      required
+                    >
                       <input
                         id="guardian_name"
                         name="guardian_name"
@@ -517,7 +576,11 @@ export default function AdmissionForm() {
                       />
                     </Field>
 
-                    <Field id="whatsapp" label="WhatsApp নম্বর" required>
+                    <Field
+                      id="whatsapp"
+                      label="WhatsApp নম্বর"
+                      required
+                    >
                       <input
                         id="whatsapp"
                         name="whatsapp"
@@ -534,6 +597,15 @@ export default function AdmissionForm() {
                 </FormSection>
 
                 <FormSection number="03" title="শিক্ষাগত তথ্য">
+                  <div className="mb-6 rounded-xl border border-blue-400/15 bg-blue-400/5 px-4 py-4">
+                    <p className="text-sm font-medium text-blue-200">
+                      জীববিজ্ঞান · অফলাইন ব্যাচ
+                    </p>
+                    <p className="mt-1 text-xs leading-6 text-slate-400">
+                      শ্রেণি নির্বাচন করে আপনার ব্যাচের তথ্য দেখুন।
+                    </p>
+                  </div>
+
                   <div className="grid gap-5 sm:grid-cols-2">
                     <Field id="class" label="শ্রেণি" required>
                       <select
@@ -545,10 +617,11 @@ export default function AdmissionForm() {
                         className={inputClass}
                       >
                         <option value="">শ্রেণি নির্বাচন করুন</option>
-                        <option value="Class 9">নবম শ্রেণি</option>
-                        <option value="Class 10">দশম শ্রেণি</option>
-                        <option value="Class 11">একাদশ শ্রেণি</option>
-                        <option value="Class 12">দ্বাদশ শ্রেণি</option>
+                        {classOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
                       </select>
                     </Field>
 
@@ -638,14 +711,18 @@ export default function AdmissionForm() {
                         className={inputClass}
                       >
                         <option value="">মাধ্যম নির্বাচন করুন</option>
-                        <option value="offline">অফলাইন</option>
-                        <option value="online">অনলাইন</option>
+                        <option value="offline">সরাসরি পরিশোধ</option>
+                        <option value="online">অনলাইন পেমেন্ট</option>
                       </select>
                     </Field>
 
                     {form.admission_fee_method === "online" && (
                       <div className="sm:col-span-2">
-                        <Field id="transaction_id" label="Transaction ID" required>
+                        <Field
+                          id="transaction_id"
+                          label="Transaction ID"
+                          required
+                        >
                           <input
                             id="transaction_id"
                             name="transaction_id"
@@ -659,6 +736,11 @@ export default function AdmissionForm() {
                       </div>
                     )}
                   </div>
+
+                  <p className="mt-5 text-xs leading-6 text-slate-400">
+                    পেমেন্টের তথ্য যাচাইয়ের জন্য সঠিক পরিমাণ ও
+                    প্রযোজ্য ক্ষেত্রে Transaction ID লিখুন।
+                  </p>
                 </FormSection>
 
                 <FormSection number="05" title="ঠিকানার তথ্য">
@@ -701,23 +783,38 @@ export default function AdmissionForm() {
               </div>
 
               {/* Application summary */}
-              <aside className="rounded-2xl border border-white/10 bg-[#101A2C] p-6 lg:sticky lg:top-8">
-                <p className="text-xs uppercase tracking-[0.18em] text-blue-300">
-                  Your Application
+              <aside className="rounded-2xl border border-white/10 bg-[#101A2C] p-6 lg:sticky lg:top-28">
+                <p className="text-sm font-medium text-blue-300">
+                  SHISHIR BioVerse
                 </p>
+
                 <h2 className="mt-3 text-xl font-semibold text-white">
                   আবেদনের সারসংক্ষেপ
                 </h2>
 
                 <dl className="mt-6 space-y-4 text-sm">
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-400">শ্রেণি</dt>
-                    <dd>{form.class || "নির্বাচন করা হয়নি"}</dd>
+                    <dt className="text-slate-400">বিষয়</dt>
+                    <dd>জীববিজ্ঞান</dd>
                   </div>
+
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-400">ক্লাসের ধরন</dt>
+                    <dd>অফলাইন</dd>
+                  </div>
+
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-400">শ্রেণি</dt>
+                    <dd className="text-right">
+                      {selectedClassLabel || "নির্বাচন করা হয়নি"}
+                    </dd>
+                  </div>
+
                   <div className="flex justify-between gap-4">
                     <dt className="text-slate-400">ব্যাচ</dt>
                     <dd>{form.batch || "—"}</dd>
                   </div>
+
                   <div className="flex justify-between gap-4 border-t border-white/10 pt-4">
                     <dt className="text-slate-400">ভর্তি ফি</dt>
                     <dd className="font-medium text-blue-200">
@@ -778,8 +875,17 @@ export default function AdmissionForm() {
                 </button>
 
                 <p className="mt-4 text-xs leading-6 text-slate-400">
-                  আবেদন জমা হওয়ার পর আমাদের টিম আপনার তথ্য যাচাই করবে।
+                  আবেদন জমা হওয়ার পর তথ্য ও পেমেন্ট যাচাই
+                  করে ভর্তি নিশ্চিত করা হবে।
                 </p>
+
+                <Link
+                  href="/contact"
+                  className={`mt-4 inline-flex min-h-11 items-center gap-2 rounded-md text-sm text-blue-300 hover:text-blue-200 ${focusClass}`}
+                >
+                  সহায়তার জন্য যোগাযোগ করুন
+                  <ArrowRight aria-hidden="true" size={16} />
+                </Link>
               </aside>
             </div>
           </fieldset>
@@ -792,14 +898,22 @@ export default function AdmissionForm() {
         aria-labelledby="rules-heading"
         onCancel={() => setShowRules(false)}
         onClose={() => setShowRules(false)}
-        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl border border-white/15 bg-[#101A2C] p-0 text-slate-100 shadow-2xl backdrop:bg-black/75"
+        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-2xl border border-white/15 bg-[#101A2C] p-0 text-slate-100 shadow-2xl backdrop:bg-black/75"
       >
         <div className="flex items-start justify-between gap-4 border-b border-white/10 p-5 sm:p-6">
           <div>
-            <p className="text-xs tracking-wider text-blue-300">
-              THE CURIOUS CLASSROOM
+            <p className="text-sm font-medium text-blue-300">
+              SHISHIR BioVerse
             </p>
-            <h2 id="rules-heading" className="mt-2 text-xl font-semibold">
+
+            <p className="mt-1 text-xs text-slate-400">
+              The Curious Classroom
+            </p>
+
+            <h2
+              id="rules-heading"
+              className="mt-3 text-xl font-semibold"
+            >
               কোচিংয়ের নিয়মাবলি
             </h2>
           </div>

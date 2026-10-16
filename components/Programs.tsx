@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  Atom,
+  Leaf,
   GraduationCap,
   Check,
   ArrowUpRight,
@@ -12,35 +12,33 @@ import {
 const programs = [
   {
     id: "ssc",
-    label: "SECONDARY",
-    title: "SSC বিজ্ঞান বিভাগ",
+    label: "SSC BIOLOGY",
+    title: "SSC জীববিজ্ঞান",
     classes: "নবম–দশম শ্রেণি",
     description:
-      "নবম ও দশম শ্রেণির শিক্ষার্থীদের জন্য বোর্ড পরীক্ষা উপযোগী সম্পূর্ণ প্রস্তুতি।",
-    icon: Atom,
-    subjects: [
-      "পদার্থবিজ্ঞান",
-      "রসায়ন",
-      "জীববিজ্ঞান",
-      "উচ্চতর গণিত",
+      "জীববিজ্ঞানের মূল ধারণাগুলো বুঝে শেখা এবং স্কুল ও বোর্ড পরীক্ষার জন্য ধাপে ধাপে প্রস্তুতি।",
+    icon: Leaf,
+    topics: [
+      "পাঠ্যবইয়ের অধ্যায়ভিত্তিক আলোচনা",
+      "জীববিজ্ঞানের ধারণা ও ব্যাখ্যা",
+      "চিত্র বুঝে শেখা",
+      "পরীক্ষার প্রশ্নের অনুশীলন",
     ],
-    feature: "নিয়মিত পরীক্ষা ও মূল্যায়ন",
   },
   {
     id: "hsc",
-    label: "HIGHER SECONDARY",
-    title: "HSC বিজ্ঞান বিভাগ",
+    label: "HSC BIOLOGY",
+    title: "HSC জীববিজ্ঞান",
     classes: "একাদশ–দ্বাদশ শ্রেণি",
     description:
-      "একাদশ ও দ্বাদশ শ্রেণির শিক্ষার্থীদের জন্য বোর্ড পরীক্ষা এবং উচ্চশিক্ষার প্রস্তুতি।",
+      "জীববিজ্ঞান প্রথম ও দ্বিতীয় পত্রের বিষয়গুলো বুঝে শেখা এবং কলেজ ও বোর্ড পরীক্ষার প্রস্তুতি।",
     icon: GraduationCap,
-    subjects: [
-      "পদার্থবিজ্ঞান",
-      "রসায়ন",
-      "জীববিজ্ঞান",
-      "উচ্চতর গণিত",
+    topics: [
+      "জীববিজ্ঞান প্রথম পত্র",
+      "জীববিজ্ঞান দ্বিতীয় পত্র",
+      "চিত্র ও জৈবিক প্রক্রিয়ার ব্যাখ্যা",
+      "পরীক্ষার প্রশ্নের অনুশীলন",
     ],
-    feature: "বিশ্ববিদ্যালয় ভর্তি প্রস্তুতি",
   },
 ];
 
@@ -69,10 +67,11 @@ export default function Programs() {
           <div className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className="h-px w-8 bg-blue-400"
+              className="h-px w-8 shrink-0 bg-blue-400"
             />
+
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-blue-300">
-              Our Programs
+              SHISHIR BioVerse
             </p>
           </div>
 
@@ -80,16 +79,17 @@ export default function Programs() {
             id="programs-heading"
             className="mt-5 text-3xl font-semibold leading-snug text-white sm:text-4xl"
           >
-            আমাদের শিক্ষা কার্যক্রম
+            আমাদের অফলাইন ব্যাচ
           </h2>
 
           <p className="mt-4 max-w-xl text-base leading-8 text-slate-400">
-            SSC ও HSC বিজ্ঞান বিভাগের শিক্ষার্থীদের জন্য পরিকল্পিত
-            ও ফলাফলভিত্তিক শিক্ষা ব্যবস্থা।
+            SSC ও HSC জীববিজ্ঞান শেখো শিশিরের সরাসরি
+            গাইডলাইনে। শ্রেণিকক্ষে আলোচনা, প্রশ্ন ও অনুশীলনের
+            মাধ্যমে এগিয়ে নাও তোমার প্রস্তুতি।
           </p>
         </motion.div>
 
-        {/* Program cards */}
+        {/* Batch cards */}
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:mt-12 lg:gap-8">
           {programs.map((program) => {
             const Icon = program.icon;
@@ -117,70 +117,74 @@ export default function Programs() {
                     />
                   </div>
 
-                  <span className="text-[10px] font-medium tracking-[0.16em] text-slate-400 sm:text-xs">
-                    {program.label}
+                  <span className="rounded-full border border-blue-400/20 bg-blue-400/5 px-3 py-1.5 text-xs font-medium text-blue-200">
+                    অফলাইন ব্যাচ
                   </span>
                 </div>
 
-                <p className="mt-7 text-sm font-medium text-blue-300">
-                  {program.classes}
+                <p className="mt-7 text-[10px] font-medium tracking-[0.16em] text-slate-500 sm:text-xs">
+                  {program.label}
                 </p>
 
                 <h3
                   id={`${program.id}-heading`}
-                  className="mt-2 text-2xl font-semibold leading-snug text-white lg:text-3xl"
+                  className="mt-3 text-2xl font-semibold leading-snug text-white lg:text-3xl"
                 >
                   {program.title}
                 </h3>
+
+                <p className="mt-3 text-sm font-medium text-blue-300">
+                  {program.classes}
+                </p>
 
                 <p className="mt-4 text-base leading-8 text-slate-300">
                   {program.description}
                 </p>
 
-                {/* Subjects */}
+                {/* Learning focus */}
                 <div className="mt-7 border-t border-white/10 pt-6">
                   <p className="text-xs font-medium text-slate-400">
-                    অন্তর্ভুক্ত বিষয়সমূহ
+                    পড়াশোনার মূল বিষয়
                   </p>
 
                   <ul className="mt-4 grid gap-x-5 gap-y-4 sm:grid-cols-2">
-                    {program.subjects.map((subject) => (
+                    {program.topics.map((topic) => (
                       <li
-                        key={subject}
-                        className="flex items-center gap-3 text-sm leading-6 text-slate-200"
+                        key={topic}
+                        className="flex items-start gap-3 text-sm leading-6 text-slate-200"
                       >
                         <Check
                           aria-hidden="true"
                           size={16}
                           strokeWidth={1.8}
-                          className="shrink-0 text-blue-400"
+                          className="mt-1 shrink-0 text-blue-400"
                         />
-                        {subject}
+
+                        {topic}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Additional support */}
-                <div className="mb-8 mt-6 flex items-start gap-3 rounded-xl border border-blue-400/10 bg-blue-400/5 px-4 py-3.5">
-                  <Check
-                    aria-hidden="true"
-                    size={17}
-                    strokeWidth={1.8}
-                    className="mt-0.5 shrink-0 text-blue-300"
-                  />
-                  <p className="text-sm leading-6 text-blue-200">
-                    {program.feature}
+                {/* Teacher identity */}
+                <div className="mb-8 mt-6 rounded-xl border border-blue-400/10 bg-blue-400/5 px-4 py-4">
+                  <p className="text-xs text-slate-400">
+                    তোমার জীববিজ্ঞান শিক্ষক
+                  </p>
+
+                  <p className="mt-2 text-sm font-medium leading-7 text-blue-200">
+                    মো. মাহফুজ শাহারিয়া শিশির
                   </p>
                 </div>
 
                 {/* Action */}
                 <Link
                   href="/admission"
-                  aria-label={`${program.title} — ভর্তির আবেদন করুন`}
+                  aria-label={`${program.title} অফলাইন ব্যাচে ভর্তির আবেদন করুন`}
                   className="mt-auto flex min-h-12 items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/[0.03] px-5 py-3.5 text-sm font-medium text-white transition-colors hover:border-blue-400/40 hover:bg-blue-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-4 focus-visible:ring-offset-[#101A2C]"
                 >
                   ভর্তির আবেদন করুন
+
                   <ArrowUpRight
                     aria-hidden="true"
                     size={19}

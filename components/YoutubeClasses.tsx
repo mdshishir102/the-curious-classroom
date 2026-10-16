@@ -50,7 +50,7 @@ export default function YoutubeClasses() {
           throw new Error("Invalid video response");
         }
 
-        setVideos(data.slice(0, 3));
+        setVideos(data.slice(0, 4));
       } catch {
         if (!controller.signal.aborted) {
           setError(true);
@@ -121,9 +121,21 @@ export default function YoutubeClasses() {
 
             <div
               aria-hidden="true"
-              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+
+
+
+className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+
+
+
             >
-              {[1, 2, 3].map((item) => (
+
+
+              {[1, 2, 3, 4].map((item) => (
+
+
+
+
                 <div
                   key={item}
                   className="overflow-hidden rounded-2xl border border-white/10 bg-[#101A2C] motion-safe:animate-pulse"
@@ -167,8 +179,20 @@ export default function YoutubeClasses() {
 
         {/* Video cards */}
         {!loading && !error && videos.length > 0 && (
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:mt-12 lg:grid-cols-3">
+
+
+
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          
+          
+          
+          
+          
+          
             {videos.map((video) => (
+
+
+
               <article key={video.id} className="h-full">
                 <a
                   href={video.url}

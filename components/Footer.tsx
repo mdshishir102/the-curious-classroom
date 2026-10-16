@@ -1,25 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  MapPin,
   Phone,
-  Mail,
+  MessageCircle,
+  MapPin,
   ArrowUpRight,
   Play,
 } from "lucide-react";
 
-const contact = {
-  address: "",
-  phone: "",
-  phoneHref: "", // উদাহরণ: +8801XXXXXXXXX
-  email: "",
-};
+const phone = "01346071073";
+const phoneHref = "tel:+8801346071073";
+
+const whatsappUrl = `https://wa.me/8801346071073?text=${encodeURIComponent(
+  "আসসালামু আলাইকুম। Shishir BioVerse-এর ব্যাচ ও ক্লাসের লোকেশন জানতে চাই।"
+)}`;
+
+const channelUrl =
+  "https://www.youtube.com/@TheCuriousClassroom-s2s";
 
 const quickLinks = [
   { label: "আমাদের সম্পর্কে", href: "/about" },
-  { label: "কোর্সসমূহ", href: "/courses" },
-  { label: "শিক্ষকবৃন্দ", href: "/teachers" },
-  { label: "ভর্তি করুন", href: "/admission" },
+  { label: "আমাদের ব্যাচ", href: "/courses" },
+  { label: "শিক্ষক পরিচিতি", href: "/teachers" },
+  { label: "ভর্তির আবেদন", href: "/admission" },
+  { label: "ফলাফল", href: "/result" },
   { label: "শিক্ষার্থী লগইন", href: "/student/login" },
 ];
 
@@ -48,14 +52,28 @@ export default function Footer() {
               />
             </Link>
 
-            <p className="mt-6 max-w-sm text-sm leading-8 text-slate-400">
-              নবম–দশম ও একাদশ–দ্বাদশ শ্রেণির বিজ্ঞান বিভাগের
-              শিক্ষার্থীদের জন্য অফলাইন ক্লাস ও ডিজিটাল শেখার
-              সমন্বিত আধুনিক শিক্ষা প্ল্যাটফর্ম।
+            <div className="mt-6 border-l-2 border-blue-400/60 pl-4">
+              <p className="text-xl font-semibold tracking-tight text-white">
+                SHISHIR{" "}
+                <span className="font-medium text-blue-300">
+                  BioVerse
+                </span>
+              </p>
+
+              <p className="mt-2 text-xs tracking-wide text-slate-400">
+                Where Curiosity Meets Life
+              </p>
+            </div>
+
+            <p className="mt-5 max-w-sm text-sm leading-8 text-slate-400">
+              The Curious Classroom-এর জীববিজ্ঞান বিভাগ
+              Shishir BioVerse। শিশিরের সরাসরি দিকনির্দেশনায়
+              SSC ও HSC শিক্ষার্থীদের জন্য অফলাইন জীববিজ্ঞান
+              ক্লাস, নিয়মিত অনুশীলন ও পরীক্ষার প্রস্তুতি।
             </p>
 
             <a
-              href="https://www.youtube.com/@TheCuriousClassroom-s2s"
+              href={channelUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={`mt-6 inline-flex min-h-11 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 transition-colors hover:border-blue-400/30 hover:bg-blue-400/5 hover:text-white ${focusStyle}`}
@@ -64,11 +82,17 @@ export default function Footer() {
                 aria-hidden="true"
                 size={16}
                 strokeWidth={1.7}
-                className="text-blue-300"
+                className="shrink-0 text-blue-300"
               />
-              আমাদের YouTube চ্যানেল
-              <ArrowUpRight aria-hidden="true" size={16} />
-              <span className="sr-only">— নতুন ট্যাবে খুলবে</span>
+              YouTube-এ ফ্রি ভিডিও
+              <ArrowUpRight
+                aria-hidden="true"
+                size={16}
+                className="shrink-0"
+              />
+              <span className="sr-only">
+                — নতুন ট্যাবে খুলবে
+              </span>
             </a>
           </div>
 
@@ -102,67 +126,75 @@ export default function Footer() {
             </h2>
 
             <p className="mt-5 text-sm leading-7 text-slate-400">
-              ভর্তি ও শিক্ষা কার্যক্রম সম্পর্কে বিস্তারিত জানতে
-              আমাদের সঙ্গে যোগাযোগ করুন।
+              ভর্তি, ক্লাসের সময়, ফি ও লোকেশন জানতে সরাসরি
+              ফোন করুন অথবা WhatsApp-এ মেসেজ দিন।
             </p>
 
-            <address className="mt-5 space-y-4 text-sm not-italic leading-7 text-slate-300">
-              {contact.address && (
-                <div className="flex items-start gap-3">
-                  <MapPin
-                    aria-hidden="true"
-                    size={18}
-                    className="mt-1 shrink-0 text-blue-300"
-                  />
-                  <span>{contact.address}</span>
-                </div>
-              )}
+            <a
+              href={phoneHref}
+              className={`mt-4 inline-flex min-h-11 items-center gap-3 rounded-md py-2 text-lg font-medium text-slate-200 transition-colors hover:text-blue-200 ${focusStyle}`}
+            >
+              <Phone
+                aria-hidden="true"
+                size={18}
+                className="shrink-0 text-blue-300"
+              />
+              {phone}
+            </a>
 
-              {contact.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone
-                    aria-hidden="true"
-                    size={18}
-                    className="shrink-0 text-blue-300"
-                  />
+            <div className="mt-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-400/25 bg-blue-400/5 px-4 py-2.5 text-sm font-medium text-blue-200 transition-colors hover:bg-blue-400/10 ${focusStyle}`}
+              >
+                <MessageCircle
+                  aria-hidden="true"
+                  size={18}
+                  className="shrink-0"
+                />
+                WhatsApp-এ মেসেজ দিন
+                <ArrowUpRight
+                  aria-hidden="true"
+                  size={16}
+                  className="shrink-0"
+                />
+                <span className="sr-only">
+                  — নতুন ট্যাবে খুলবে
+                </span>
+              </a>
+            </div>
 
-                  <a
-                    href={`tel:${
-                      contact.phoneHref ||
-                      contact.phone.replace(/[\s()-]/g, "")
-                    }`}
-                    className={`rounded-md py-2 transition-colors hover:text-blue-200 ${focusStyle}`}
-                  >
-                    {contact.phone}
-                  </a>
-                </div>
-              )}
-
-              {contact.email && (
-                <div className="flex items-start gap-3">
-                  <Mail
-                    aria-hidden="true"
-                    size={18}
-                    className="mt-3 shrink-0 text-blue-300"
-                  />
-
-                  <a
-                    href={`mailto:${contact.email}`}
-                    className={`min-w-0 break-words rounded-md py-2 transition-colors hover:text-blue-200 ${focusStyle}`}
-                  >
-                    {contact.email}
-                  </a>
-                </div>
-              )}
-            </address>
+            <div className="mt-5 flex items-start gap-3 text-sm leading-7 text-slate-400">
+              <MapPin
+                aria-hidden="true"
+                size={18}
+                className="mt-1 shrink-0 text-blue-300"
+              />
+              <p>
+                ক্লাসের ঠিকানা ও আসার নির্দেশনা ফোন বা
+                WhatsApp-এ জানিয়ে দেওয়া হবে।
+              </p>
+            </div>
 
             <Link
               href="/contact"
-              className={`mt-5 inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-sm font-medium text-blue-300 transition-colors hover:text-blue-200 ${focusStyle}`}
+              className={`mt-4 inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-sm font-medium text-blue-300 transition-colors hover:text-blue-200 ${focusStyle}`}
             >
               যোগাযোগের বিস্তারিত
               <ArrowUpRight aria-hidden="true" size={17} />
             </Link>
+
+            <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-4">
+              <p className="text-sm font-medium text-slate-200">
+                SSC ও HSC · জীববিজ্ঞান
+              </p>
+
+              <p className="mt-1 text-xs leading-6 text-slate-400">
+                নবম–দ্বাদশ শ্রেণি · অফলাইন ব্যাচ
+              </p>
+            </div>
           </div>
         </div>
 
@@ -170,7 +202,7 @@ export default function Footer() {
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row lg:mt-16">
           <p className="text-center text-xs leading-6 text-slate-400 sm:text-left">
             © {new Date().getFullYear()} The Curious Classroom.
-            সর্বস্বত্ব সংরক্ষিত।
+            {" "}সর্বস্বত্ব সংরক্ষিত।
           </p>
 
           <Link

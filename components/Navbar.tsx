@@ -5,13 +5,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
-const menu = [
+type MenuItem = {
+  name: string;
+  link: string;
+  external?: boolean;
+};
+
+const menu: MenuItem[] = [
   { name: "হোম", link: "/" },
   { name: "আমাদের সম্পর্কে", link: "/about" },
-  { name: "কোর্সসমূহ", link: "/courses" },
-  { name: "শিক্ষকবৃন্দ", link: "/teachers" },
+  { name: "আমাদের ব্যাচ", link: "/courses" },
+  { name: "শিক্ষক পরিচিতি", link: "/teachers" },
   {
-    name: "অনলাইন ক্লাস",
+    name: "ফ্রি ভিডিও",
     link: "https://www.youtube.com/@TheCuriousClassroom-s2s",
     external: true,
   },
@@ -45,7 +51,7 @@ export default function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex min-h-[88px] items-center justify-between gap-5">
-          {/* Logo */}
+          {/* Main brand */}
           <Link
             href="/"
             aria-label="The Curious Classroom — হোম"
@@ -90,7 +96,9 @@ export default function Navbar() {
                   <span aria-hidden="true" className="ml-1 text-xs">
                     ↗
                   </span>
-                  <span className="sr-only"> — নতুন ট্যাবে খুলবে</span>
+                  <span className="sr-only">
+                    {" "}— নতুন ট্যাবে খুলবে
+                  </span>
                 </a>
               ) : (
                 <Link
@@ -113,7 +121,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className={`hidden items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-600 px-5 py-3 text-sm font-medium text-white shadow-[0_4px_20px_rgba(37,99,235,0.18)] transition-colors hover:bg-blue-500 sm:inline-flex ${focusStyle}`}
             >
-              ভর্তি করুন
+              ভর্তির আবেদন
               <span aria-hidden="true">↗</span>
             </Link>
 
@@ -185,7 +193,9 @@ export default function Navbar() {
                 >
                   {item.name}
                   <span aria-hidden="true">↗</span>
-                  <span className="sr-only"> — নতুন ট্যাবে খুলবে</span>
+                  <span className="sr-only">
+                    {" "}— নতুন ট্যাবে খুলবে
+                  </span>
                 </a>
               ) : (
                 <Link
@@ -212,7 +222,7 @@ export default function Navbar() {
             onClick={() => setOpen(false)}
             className={`mt-4 flex items-center justify-center gap-3 rounded-xl bg-blue-600 px-6 py-3.5 font-medium text-white transition-colors hover:bg-blue-500 ${focusStyle}`}
           >
-            ভর্তি করুন
+            ভর্তির আবেদন
             <span aria-hidden="true">↗</span>
           </Link>
         </div>

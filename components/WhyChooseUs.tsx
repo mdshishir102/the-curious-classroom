@@ -4,38 +4,38 @@ import {
   BookOpen,
   GraduationCap,
   ChartNoAxesCombined,
-  Monitor,
+  MessageCircle,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const features = [
   {
     number: "01",
-    title: "ধারণাভিত্তিক শিক্ষা",
+    title: "বুঝে শেখা জীববিজ্ঞান",
     description:
-      "প্রতিটি বিষয় সহজভাবে বুঝে শেখা এবং নিয়মিত অনুশীলনের মাধ্যমে শক্ত ভিত্তি তৈরি করা।",
+      "পাঠ্যবইয়ের ধারণা, চিত্র ও জৈবিক প্রক্রিয়া সহজ ব্যাখ্যায় বুঝে শেখা—প্রতিটি অধ্যায়ের ভিত্তি পরিষ্কার করা।",
     icon: BookOpen,
   },
   {
     number: "02",
-    title: "অভিজ্ঞ শিক্ষকের গাইডলাইন",
+    title: "শিশিরের সরাসরি গাইডলাইন",
     description:
-      "দক্ষ ও অভিজ্ঞ শিক্ষকদের নিয়মিত তত্ত্বাবধান এবং ব্যক্তিগত সহযোগিতা।",
+      "SSC ও HSC জীববিজ্ঞানের ক্লাসে শিশিরের সরাসরি পাঠদান এবং বুঝতে অসুবিধা হওয়া বিষয়গুলো নিয়ে আলোচনা।",
     icon: GraduationCap,
   },
   {
     number: "03",
     title: "নিয়মিত পরীক্ষা ও মূল্যায়ন",
     description:
-      "পরিকল্পিত পরীক্ষায় অগ্রগতি পর্যবেক্ষণ এবং দুর্বল বিষয়গুলোতে উন্নতির নির্দেশনা।",
+      "পরীক্ষার মাধ্যমে নিজের প্রস্তুতি যাচাই, ভুলগুলো চিহ্নিত করা এবং পরবর্তী অনুশীলনে সেগুলো সংশোধন করা।",
     icon: ChartNoAxesCombined,
   },
   {
     number: "04",
-    title: "আধুনিক শিক্ষা ব্যবস্থা",
+    title: "শ্রেণিকক্ষেই প্রশ্ন ও আলোচনা",
     description:
-      "অফলাইন ক্লাসের পাশাপাশি অনলাইন সুবিধায় নিজের সুবিধামতো শেখার সুযোগ।",
-    icon: Monitor,
+      "অফলাইন ক্লাসে সরাসরি প্রশ্ন করার সুযোগ। যেখানে বুঝতে সমস্যা, সেখানেই আলোচনা করে ধারণা পরিষ্কার করা।",
+    icon: MessageCircle,
   },
 ];
 
@@ -63,8 +63,9 @@ export default function WhyChooseUs() {
           <div className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className="h-px w-8 bg-blue-400"
+              className="h-px w-8 shrink-0 bg-blue-400"
             />
+
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-blue-300">
               The Way We Teach
             </p>
@@ -75,25 +76,31 @@ export default function WhyChooseUs() {
             className="mt-5 text-3xl font-semibold leading-snug tracking-tight text-white sm:text-4xl"
           >
             কেন
-            <span className="mt-2 block">
-              The Curious
-              <br />
-              Classroom?
+            <span className="mt-3 block font-bold tracking-wide text-blue-400">
+              SHISHIR
+            </span>
+            <span className="mt-1 block">
+              BioVerse?
             </span>
           </h2>
 
           <p className="mt-5 max-w-md text-base leading-8 text-slate-300">
-            শিক্ষার্থীদের শেখার আগ্রহ, দক্ষতা ও আত্মবিশ্বাস গড়ে
-            তুলতে আমাদের শিক্ষা পদ্ধতির চারটি ভিত্তি।
+            জীববিজ্ঞান বুঝে শেখা এবং নিজের প্রস্তুতি নিয়ে
+            আত্মবিশ্বাস গড়ে তোলা—এই লক্ষ্যেই আমাদের
+            অফলাইন ক্লাসের চারটি ভিত্তি।
           </p>
 
           <div className="mt-8 border-l-2 border-blue-400/60 pl-5">
             <p className="text-lg font-medium leading-8 text-blue-200">
-              বুঝে শেখা।
+              প্রশ্ন থেকে বোঝা।
               <br />
-              অনুশীলনে এগিয়ে যাওয়া।
+              অনুশীলন থেকে আত্মবিশ্বাস।
             </p>
           </div>
+
+          <p className="mt-7 text-xs leading-6 text-slate-400">
+            The Curious Classroom-এর জীববিজ্ঞান বিভাগ
+          </p>
         </motion.div>
 
         {/* Teaching principles */}
