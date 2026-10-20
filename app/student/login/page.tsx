@@ -38,56 +38,98 @@ export default function StudentLogin() {
   const inputStyle =
     "min-h-14 w-full rounded-xl border border-white/15 bg-[#080F1D] py-3.5 pl-12 pr-4 text-base text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 disabled:opacity-60";
 
-  async function login(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+ 
+async function login(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
-    if (submittingRef.current) return;
+  if (submittingRef.current) return;
 
-    setError("");
+  setError("");
 
-    if (!studentID.trim() || !password) {
-      setError("Student ID ও Password লিখুন।");
+  if (!studentID.trim() || !password) {
+    setError("Student ID ও Password লিখুন।");
+    return;
+  }
+
+  submittingRef.current = true;
+  setLoading(true);
+
+  let navigating = false;
+
+  try {
+    // Remove information left by the old login system.
+    localStorage.removeItem("student");
+    localStorage.removeItem("student_id");
+
+    const response = await fetch("/api/student/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        studentID: studentID.trim(),
+        password,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setError(result.error || "লগইন করা যায়নি।");
       return;
     }
 
-    submittingRef.current = true;
-    setLoading(true);
+    if (
+      !result.session?.access_token ||
+      !result.session?.refresh_token ||
+      !result.student?.student_id
+    ) {
+      setError("লগইনের তথ্য পাওয়া যায়নি। আবার চেষ্টা করুন।");
+      return;
+    }
 
-    let navigating = false;
+    const { data, error: sessionError } =
+      await supabase.auth.setSession({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+      });
 
-    try {
-      // Existing login lookup retained.
-      // Password verification must be implemented on the server.
-      const { data: studentData, error: loginError } = await supabase
-        .from("students")
-        .select("*")
-        .eq("student_id", studentID.trim())
-        .single();
+    if (sessionError || !data.session) {
+      setError("Login session তৈরি হয়নি। আবার চেষ্টা করুন।");
+      return;
+    }
 
-      if (loginError || !studentData) {
-        setError("লগইন করা যায়নি। আপনার তথ্য পরীক্ষা করে আবার চেষ্টা করুন।");
-        return;
-      }
+    localStorage.setItem(
+      "student",
+      JSON.stringify(result.student)
+    );
 
-      if (!studentData.login_enabled) {
-        setError("আপনার লগইন চালু নেই। সহায়তার জন্য যোগাযোগ করুন।");
-        return;
-      }
+    localStorage.setItem(
+      "student_id",
+      result.student.student_id
+    );
 
-      localStorage.setItem("student", JSON.stringify(studentData));
-      localStorage.setItem("student_id", studentData.student_id);
-
-      router.replace("/student/dashboard");
-      navigating = true;
-    } catch {
-      setError("লগইন করা যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।");
-    } finally {
-      if (!navigating) {
-        submittingRef.current = false;
-        setLoading(false);
-      }
+    router.replace("/student/dashboard");
+    navigating = true;
+  } catch {
+    setError(
+      "লগইন করা যাচ্ছে না। Internet ও server চালু আছে কি না দেখুন।"
+    );
+  } finally {
+    if (!navigating) {
+      submittingRef.current = false;
+      setLoading(false);
     }
   }
+}
+
+
+
+
+
+
+
 
   return (
     <main className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-[#080D19] text-slate-100">

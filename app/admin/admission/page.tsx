@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
+import { supabase } from "@/lib/supabase";
+import { useEffect, useRef, useState } from "react";
 
 export default function AdmissionPage(){
 
@@ -14,7 +14,7 @@ const [loading,setLoading] = useState(true);
 
 const [selectedStudent,setSelectedStudent] = useState<any>(null);
 
-
+const statusUpdatingRef = useRef(false);
 
 
 // ======================
@@ -153,163 +153,98 @@ window.open(url,"_blank");
 // ======================
 
 
-async function updateStatus(
-id:number,
-status:string
-){
-
-
-const student =
-students.find(
-item=>item.id===id
-);
-
-
-
-if(!student) return;
-
-
-
-if(status==="rejected"){
-
-
-const {error}=await supabase
-.from("students")
-.update({
-
-status:"rejected"
-
-})
-.eq("id",id);
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-alert("Rejected");
-
-loadStudents();
-
-return;
-
-
-}
-
-
-
-
-
-
-if(status==="approved"){
-
-
-
-if(student.payment_status!=="paid"){
-
-alert("Payment clear না হলে approve করা যাবে না");
-
-return;
-
-}
-
-
-
-
-const prefix =
-student.batch?.startsWith("SSC")
-?
-"TCCS"
-:
-"TCCH";
-
-
-
-const batchYear =
-student.batch.replace(/\D/g,"");
-
-
-
-const {
-count
-}=await supabase
-.from("students")
-.select("*",
-{
-count:"exact",
-head:true
-})
-.like(
-"student_id",
-`${prefix}${batchYear}%`
-);
-
-
-
-const studentID =
-prefix+
-batchYear+
-String((count||0)+1)
-.padStart(3,"0");
-
-
-
-const password =
-Math.random()
-.toString(36)
-.substring(2,10)
-.toUpperCase();
-
-
-
-const {error}=await supabase
-.from("students")
-.update({
-
-status:"approved",
-
-student_id:studentID,
-
-password:password,
-
-login_enabled:true
-
-})
-.eq("id",id);
-
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-alert(
-`Approved\n\nID: ${studentID}\nPassword: ${password}`
-);
-
-
-
-loadStudents();
-
-
-}
-
-
-
+async function updateStatus(id: number, status: string) {
+  if (statusUpdatingRef.current) return;
+
+  if (status !== "approved" && status !== "rejected") return;
+
+  statusUpdatingRef.current = true;
+
+  try {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      alert("আবার Admin Login করুন।");
+      return;
+    }
+
+    if (status === "rejected") {
+      const { data, error } = await supabase
+        .from("students")
+        .update({
+          status: "rejected",
+          login_enabled: false,
+        })
+        .eq("id", id)
+        .eq("status", "pending")
+        .select("id");
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      if (!data?.length) {
+        alert(
+          "Reject করা হয়নি। শিক্ষার্থীর status বা আপনার access পরিবর্তিত হতে পারে।"
+        );
+        await loadStudents();
+        return;
+      }
+
+      setSelectedStudent(null);
+      alert("ভর্তির আবেদন বাতিল করা হয়েছে।");
+      await loadStudents();
+      return;
+    }
+
+    // The server verifies admin access and payment,
+    // creates the Auth account, then enables login.
+    const response = await fetch("/api/admin/students/approve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+      body: JSON.stringify({ id }),
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || result?.success !== true) {
+      alert(
+        result?.error ||
+          `Approve করা যায়নি। Server response: ${response.status}`
+      );
+
+      await loadStudents();
+      return;
+    }
+
+    setSelectedStudent(null);
+
+    if (result.alreadyApproved) {
+      alert(
+        `এই শিক্ষার্থী আগেই approved হয়েছে।\n\nStudent ID: ${result.studentID}`
+      );
+    } else {
+      alert(
+        `ভর্তি অনুমোদিত হয়েছে।\n\nStudent ID: ${result.studentID}\nPassword: ${result.password}`
+      );
+    }
+
+    await loadStudents();
+  } catch {
+    alert(
+      "Server-এর সঙ্গে যোগাযোগ সম্পূর্ণ হয়নি। তালিকা refresh করে status দেখুন। Pending থাকলে আবার চেষ্টা করুন।"
+    );
+  } finally {
+    statusUpdatingRef.current = false;
+  }
 }
 
 

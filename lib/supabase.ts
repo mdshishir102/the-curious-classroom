@@ -1,12 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-const supabaseUrl = "https://bnbzrpdvtuylqzaqwpan.supabase.co";
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const supabaseAnonKey = "sb_publishable_t42Lf8FhQX1MjB0JXlLh-A_gMcpn8Dt";
-
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Supabase configuration পাওয়া যায়নি।");
+}
 
 export const supabase = createClient(
   supabaseUrl,
-  supabaseAnonKey
+  supabaseKey
 );

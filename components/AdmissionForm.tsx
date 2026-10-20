@@ -348,11 +348,35 @@ export default function AdmissionForm() {
 
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: "auto" });
-    } catch {
-      setError(
-        "আবেদন জমা দেওয়া যায়নি। আপনার পূরণ করা তথ্য ফর্মে আছে—কিছুক্ষণ পর আবার চেষ্টা করুন।"
-      );
-    } finally {
+   
+   
+   
+ } catch (err: unknown) {
+  const failure = err as {
+    code?: string;
+    message?: string;
+    status?: number;
+    statusCode?: number | string;
+  } | null;
+
+  console.error("Admission submission failed", {
+    code: failure?.code ?? null,
+    message: failure?.message ?? "Unknown error",
+    status: failure?.status ?? failure?.statusCode ?? null,
+  });
+
+  setError(
+    "আবেদন জমা দেওয়া যায়নি। আপনার পূরণ করা তথ্য ফর্মে আছে—আবার চেষ্টা করুন।"
+  );
+}
+
+
+
+
+    
+    
+    
+    finally {
       submittingRef.current = false;
       setLoading(false);
     }
@@ -499,15 +523,35 @@ export default function AdmissionForm() {
                       label="জন্ম তারিখ"
                       required
                     >
-                      <input
-                        id="date_of_birth"
-                        name="date_of_birth"
-                        type="date"
-                        required
-                        value={form.date_of_birth}
-                        onChange={handleChange}
-                        className={inputClass}
-                      />
+                      
+
+<input
+  id="date_of_birth"
+  name="date_of_birth"
+  type="date"
+  required
+  value={form.date_of_birth}
+  onChange={handleChange}
+  onClick={(event) => {
+    const input = event.currentTarget;
+
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+      }
+    } catch {
+      // Calendar না খুললেও keyboard দিয়ে তারিখ লেখা যাবে।
+      input.focus();
+    }
+  }}
+  className={inputClass}
+  style={{ colorScheme: "light" }}
+/>
+
+
+
+
+
                     </Field>
 
                     <div className="sm:col-span-2">
