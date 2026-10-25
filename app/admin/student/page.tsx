@@ -23,14 +23,12 @@ async function loadStudents(){
 
 const {data,error}=await supabase
 
+
+
 .from("students")
+.select("id, class")
+.eq("status", "approved");
 
-.select("*")
-
-.eq(
-"status",
-"approved"
-);
 
 
 

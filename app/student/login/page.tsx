@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -17,10 +17,21 @@ import {
   CircleAlert,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { getDeviceId } from "@/lib/device";
+
 
 const supportUrl = `https://wa.me/8801346071073?text=${encodeURIComponent(
-  "আসসালামু আলাইকুম। Student Login করতে সাহায্য প্রয়োজন।"
+  "আসসালামু আলাইকুম। Student Login করতে সাহায্য প্রয়োজন।"
 )}`;
+
+// ===== NOTUN: ei 3 line jog korun =====
+const LOCK_MESSAGE =
+  "তোমার অ্যাকাউন্টটি লক করা হয়েছে, কারণ অন্য ডিভাইস থেকে লগইনের চেষ্টা করা হয়েছে। আনলক করতে কর্তৃপক্ষের সাথে যোগাযোগ করো।";
+
+const EXPIRED_MESSAGE =
+  "নিরাপত্তার কারণে তোমাকে লগআউট করা হয়েছে। আবার লগইন করো।";
+
+
 
 export default function StudentLogin() {
   const router = useRouter();
@@ -31,6 +42,25 @@ export default function StudentLogin() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+
+
+
+  // ===== NOTUN: ei block ta jog korun =====
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+
+    if (p.get("locked") === "1") setError(LOCK_MESSAGE);
+    else if (p.get("expired") === "1") setError(EXPIRED_MESSAGE);
+  }, []);
+
+
+
+
+
+
+
 
   const focusStyle =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-4 focus-visible:ring-offset-[#101A2C]";
@@ -95,15 +125,63 @@ async function login(event: FormEvent<HTMLFormElement>) {
         refresh_token: result.session.refresh_token,
       });
 
+  
+
+
     if (sessionError || !data.session) {
-      setError("Login session তৈরি হয়নি। আবার চেষ্টা করুন।");
+      setError("Login session তৈরি হয়নি। আবার চেষ্টা করুন।");
       return;
     }
+
+    // ===== NOTUN: Device check shuru =====
+    const deviceRes = await fetch("/api/student/device", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${result.session.access_token}`,
+      },
+      cache: "no-store",
+
+
+      body: JSON.stringify({ mode: "login", deviceId: getDeviceId() }),
+   
+   
+   
+        });
+
+    const deviceResult = await deviceRes.json().catch(() => ({}));
+
+    if (deviceResult.status !== "ok") {
+      await supabase.auth.signOut();
+      setError(
+        deviceResult.status === "locked"
+          ? LOCK_MESSAGE
+          : "Device verify করা যায়নি। আবার চেষ্টা করুন।"
+      );
+      return;
+    }
+
+
+    localStorage.setItem(
+      "session_version",
+      String(deviceResult.sessionVersion)
+    );
+
+
+
+
+
+
+    // ===== Device check shesh =====
 
     localStorage.setItem(
       "student",
       JSON.stringify(result.student)
     );
+
+
+
+
 
     localStorage.setItem(
       "student_id",

@@ -83,7 +83,7 @@ export default function Programs() {
           </h2>
 
           <p className="mt-4 max-w-xl text-base leading-8 text-slate-400">
-            SSC ও HSC জীববিজ্ঞান শেখো শিশিরের সরাসরি
+            SSC ও HSC জীববিজ্ঞান শেখো শিশির ভাইয়ার সরাসরি
             গাইডলাইনে। শ্রেণিকক্ষে আলোচনা, প্রশ্ন ও অনুশীলনের
             মাধ্যমে এগিয়ে নাও তোমার প্রস্তুতি।
           </p>

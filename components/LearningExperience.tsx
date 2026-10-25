@@ -6,7 +6,7 @@ const learningSteps = [
     label: "LEARN IN THE CLASSROOM",
     title: "ক্লাসে বুঝে শেখা",
     description:
-      "শিশিরের সরাসরি পাঠদানে জীববিজ্ঞানের প্রতিটি বিষয় ধাপে ধাপে বোঝা।",
+      "শিশির ভাইয়ার সরাসরি পাঠদানে জীববিজ্ঞানের প্রতিটি বিষয় ধাপে ধাপে বোঝা।",
     icon: School,
     features: [
       "পাঠ্যবইয়ের অধ্যায়ভিত্তিক আলোচনা",
@@ -56,7 +56,7 @@ export default function LearningExperience() {
 
           <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-slate-300">
             SSC ও HSC জীববিজ্ঞানের অফলাইন ক্লাসে শেখা থেকে
-            পরীক্ষার প্রস্তুতি—প্রতিটি ধাপে শিশিরের গাইডলাইন।
+            পরীক্ষার প্রস্তুতি—প্রতিটি ধাপে শিশির ভাইয়ার গাইডলাইন।
           </p>
         </div>
 

@@ -97,7 +97,7 @@ export default function Hero() {
   id="hero-heading"
   className="mt-7 text-3xl font-semibold leading-[1.6] text-slate-100 sm:text-4xl"
 >
-  শিশিরের ভাইয়ার সঙ্গে
+  শিশির ভাইয়ার সঙ্গে
   <br />
   বুঝে শেখো জীববিজ্ঞান।
 </h1>
@@ -111,7 +111,7 @@ export default function Hero() {
           <p className="mt-5 max-w-lg text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
             The Curious Classroom-এর জীববিজ্ঞান বিভাগ।
             নবম–দশম ও একাদশ–দ্বাদশ শ্রেণির শিক্ষার্থীদের জন্য
-            শিশিরের সরাসরি গাইডলাইনে অফলাইন ক্লাস।
+            শিশির ভাইয়ার সরাসরি গাইডলাইনে অফলাইন ক্লাস।
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-blue-400/20 bg-blue-400/[0.06] px-4 py-2">

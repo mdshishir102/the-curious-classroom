@@ -1,0 +1,207 @@
+
+/* ====================================
+   THE CURIOUS CLASSROOM
+   ADMISSION MANAGEMENT DARK THEME
+==================================== */
+
+.tcc-admission {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(35, 85, 160, 0.16),
+      transparent 35%
+    ),
+    #080e1b !important;
+  color: #e8eefb;
+}
+
+/* MAIN CARDS */
+
+.tcc-admission .bg-white {
+  background-color: #111b2e !important;
+}
+
+.tcc-admission .rounded-3xl.bg-white {
+  border: 1px solid #263650 !important;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* SECONDARY SURFACES */
+
+.tcc-admission .bg-gray-50,
+.tcc-admission .bg-gray-100,
+.tcc-admission .bg-slate-50,
+.tcc-admission .bg-slate-100 {
+  background-color: #19263c !important;
+}
+
+.tcc-admission .bg-blue-50 {
+  background-color: #142742 !important;
+}
+
+/* STATUS BACKGROUNDS */
+
+.tcc-admission .bg-green-50,
+.tcc-admission .bg-emerald-50 {
+  background-color: #10332d !important;
+}
+
+.tcc-admission .bg-green-100 {
+  background-color: #164538 !important;
+}
+
+.tcc-admission .bg-red-50 {
+  background-color: #321b29 !important;
+}
+
+.tcc-admission .bg-red-100 {
+  background-color: #472332 !important;
+}
+
+.tcc-admission .bg-yellow-50,
+.tcc-admission .bg-amber-50 {
+  background-color: #372b18 !important;
+}
+
+.tcc-admission .bg-yellow-100 {
+  background-color: #4b3717 !important;
+}
+
+/* GENERAL TEXT */
+
+.tcc-admission .text-gray-900,
+.tcc-admission .text-gray-800,
+.tcc-admission .text-gray-700,
+.tcc-admission .text-slate-900,
+.tcc-admission .text-slate-800,
+.tcc-admission .text-slate-700 {
+  color: #e8eefb !important;
+}
+
+.tcc-admission .text-gray-600,
+.tcc-admission .text-gray-500,
+.tcc-admission .text-slate-600,
+.tcc-admission .text-slate-500,
+.tcc-admission .text-slate-400 {
+  color: #a1b3cd !important;
+}
+
+/* ACCENT COLORS */
+
+.tcc-admission .text-blue-700,
+.tcc-admission .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+.tcc-admission .text-green-700,
+.tcc-admission .text-green-600,
+.tcc-admission .text-green-800,
+.tcc-admission .text-emerald-700 {
+  color: #68e5b2 !important;
+}
+
+.tcc-admission .text-red-700,
+.tcc-admission .text-red-600,
+.tcc-admission .text-red-800 {
+  color: #fda4af !important;
+}
+
+.tcc-admission .text-yellow-700,
+.tcc-admission .text-yellow-600,
+.tcc-admission .text-amber-800 {
+  color: #fbd38d !important;
+}
+
+/* BORDERS */
+
+.tcc-admission .border,
+.tcc-admission .border-b,
+.tcc-admission .border-t,
+.tcc-admission hr {
+  border-color: #2b3a53;
+}
+
+.tcc-admission .border-red-100,
+.tcc-admission .border-red-200 {
+  border-color: #704050 !important;
+}
+
+.tcc-admission .border-green-200 {
+  border-color: #275f51 !important;
+}
+
+.tcc-admission .border-amber-200 {
+  border-color: #71542b !important;
+}
+
+.tcc-admission .border-blue-100 {
+  border-color: #304c73 !important;
+}
+
+/* PHOTO */
+
+.tcc-admission img {
+  background-color: #142034;
+}
+
+/* BUTTONS */
+
+.tcc-admission button {
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tcc-admission button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.tcc-admission button.bg-white {
+  background-color: #19273e !important;
+}
+
+/* FORM INPUTS */
+
+.tcc-admission input:not([type="radio"]),
+.tcc-admission textarea,
+.tcc-admission select {
+  background-color: #0d1729 !important;
+  color: #f1f5ff !important;
+  border-color: #33445f !important;
+}
+
+.tcc-admission input::placeholder,
+.tcc-admission textarea::placeholder {
+  color: #8394ad !important;
+}
+
+.tcc-admission input[type="radio"] {
+  accent-color: #3b82f6;
+}
+
+/* MODALS */
+
+.tcc-admission [role="dialog"] {
+  background-color: #111b2e !important;
+  border: 1px solid #2b3c56;
+  color: #e8eefb;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+/* STUDENT DETAILS MODAL */
+
+.tcc-admission .bg-white.rounded-3xl {
+  background-color: #111b2e !important;
+}
+
+/* HOVER SHADOWS */
+
+.tcc-admission .shadow-lg,
+.tcc-admission .shadow-xl {
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.25) !important;
+}

@@ -67,7 +67,7 @@ export default function Footer() {
 
             <p className="mt-5 max-w-sm text-sm leading-8 text-slate-400">
               The Curious Classroom-এর জীববিজ্ঞান বিভাগ
-              Shishir BioVerse। শিশিরের সরাসরি দিকনির্দেশনায়
+              Shishir BioVerse। শিশির ভাইয়ার সরাসরি দিকনির্দেশনায়
               SSC ও HSC শিক্ষার্থীদের জন্য অফলাইন জীববিজ্ঞান
               ক্লাস, নিয়মিত অনুশীলন ও পরীক্ষার প্রস্তুতি।
             </p>

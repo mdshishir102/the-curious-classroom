@@ -54,7 +54,7 @@ export default function AdmissionCTA() {
             >
               জীববিজ্ঞান বুঝে শেখার
               <span className="mt-2 block text-blue-300">
-                শুরুটা হোক শিশিরের সঙ্গে।
+                শুরুটা হোক শিশির ভাইয়ার।
               </span>
             </h2>
 

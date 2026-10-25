@@ -37,9 +37,19 @@ async function loadStudents(){
 
 const {data,error}=await supabase
 
-.from("students")
 
-.select("*")
+.from("students")
+.select(`
+  id,
+  student_name,
+  student_id,
+  class,
+  batch,
+  whatsapp,
+  student_photo,
+  created_at
+`)
+
 
 .eq(
 "class",
@@ -130,8 +140,7 @@ search.toLowerCase()
 
 ||
 
-student.whatsapp
-.includes(search)
+(student.whatsapp ?? "").includes(search)
 
 
 );

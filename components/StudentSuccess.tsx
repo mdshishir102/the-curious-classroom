@@ -60,7 +60,7 @@ export default function StudentSuccess() {
           </h2>
 
           <p className="mt-4 text-base leading-8 text-slate-300">
-            শিশিরের সঙ্গে জীববিজ্ঞান শেখা ও পরীক্ষার
+            শিশির ভাইয়ার সঙ্গে জীববিজ্ঞান শেখা ও পরীক্ষার
             প্রস্তুতির অভিজ্ঞতা—শিক্ষার্থীদের নিজের কথায়।
           </p>
         </motion.div>
