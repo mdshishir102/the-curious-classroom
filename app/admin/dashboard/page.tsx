@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import ConsecutiveAbsentSection from "@/components/ConsecutiveAbsentSection";
+
+
 
 import {
   LayoutDashboard,
@@ -17,6 +20,7 @@ import {
   Wallet,
   ClipboardCheck,
   BookOpen,
+    Video,
   Bot,
   Dna,
   CalendarDays,
@@ -132,6 +136,18 @@ const actions: DashboardAction[] = [
     tone: "blue",
     category: "LEARNING",
   },
+
+
+  {
+    title: "Upload Recorded Classes",
+    description: "Upload lectures & lock / unlock access",
+    href: "/admin/recorded-classes",
+    icon: Video,
+    tone: "purple",
+    category: "LEARNING",
+  },
+
+
 
   {
     title: "AI Question Generator",
@@ -935,7 +951,7 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* Action Cards */}
+                         {/* Action Cards */}
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 
                 {actions.map((action) => (
@@ -948,6 +964,18 @@ export default function AdminDashboard() {
               </div>
 
             </section>
+
+            {/* Consecutive Absent + Locked Profiles */}
+            <section className="mt-12">
+              <ConsecutiveAbsentSection />
+            </section>
+
+
+
+
+
+
+
 
             {/* Bottom Security Message */}
             <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-white/[0.07] bg-[#101A2C]/70 p-5 sm:flex-row sm:items-center">
