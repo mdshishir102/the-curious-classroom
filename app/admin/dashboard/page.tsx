@@ -36,6 +36,8 @@ import {
   LoaderCircle,
   AlertCircle,
   Sparkles,
+    ListChecks,  
+        
   type LucideIcon,
 } from "lucide-react";
 
@@ -110,6 +112,20 @@ const actions: DashboardAction[] = [
     category: "FINANCE",
   },
 
+
+{
+  title: "Personal Finance",
+  description: "Track income, expenses & cash flow",
+  href: "/admin/finance",
+  icon: Wallet,
+  tone: "green",   // 👈 emerald থেকে green এ বদলানো হলো
+  category: "FINANCE",
+},
+
+
+
+
+
   {
     title: "Manage Result",
     description: "Update and manage student results",
@@ -136,6 +152,10 @@ const actions: DashboardAction[] = [
     tone: "blue",
     category: "LEARNING",
   },
+
+
+
+
 
 
   {
@@ -175,6 +195,19 @@ const actions: DashboardAction[] = [
     tone: "amber",
     category: "ACADEMIC",
   },
+
+
+  {
+    title: "Exam Schedule",
+    description: "Manage exam dates & schedule",
+    href: "/admin/exam",
+    icon: ListChecks,
+    tone: "amber",
+    category: "ACADEMIC",
+  },
+
+
+
 
   {
     title: "Student Management",

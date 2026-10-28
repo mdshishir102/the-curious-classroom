@@ -5,12 +5,19 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
+
 import {
   AlertCircle, ArrowRight, ArrowUpRight, BadgeCheck, Bell, BookOpen,
   CalendarDays, ClipboardList, Clock3, CreditCard, Download, FileText,
   GraduationCap, LayoutDashboard, LoaderCircle, LogOut, Menu, ShieldCheck,
-  Sparkles, Trophy, UserRound, Wallet, X, Video, type LucideIcon,} from "lucide-react";
-import {
+  Sparkles, Trophy, UserRound, Wallet, X, Video, TrendingUp, type LucideIcon,
+} from "lucide-react";
+
+
+
+
+  import {
   getGreeting,
   AttendanceRing,
   NextClassCard,
@@ -110,6 +117,7 @@ type StudentNavItem = {
   href: string;
   icon: LucideIcon;
   description: string;
+  external?: boolean;
 };
 
 const studentNavItems: StudentNavItem[] = [
@@ -120,6 +128,18 @@ const studentNavItems: StudentNavItem[] = [
   { title: "My Results", href: "/student/result", icon: Trophy, description: "Academic progress" },
   { title: "My Payments", href: "/student/payment", icon: CreditCard, description: "Monthly fee history" },
 ];
+
+
+const progressTrackerItem: StudentNavItem = {
+  title: "Progress Tracker",
+  href: "https://progress.battlesofbiology.org",
+  icon: TrendingUp,
+  description: "সিলেবাস সম্পন্নতা ট্র্যাক করুন",
+  external: true,
+};
+
+
+
 
 const studentGuidelines = [
   {

@@ -1,9 +1,8 @@
-
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -20,9 +19,12 @@ import {
   ClipboardCheck,
   GraduationCap,
   Shield,
+  TriangleAlert,
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
+
+const REMEMBER_EMAIL_KEY = "admin_remember_email";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -34,11 +36,58 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // --- UI-only additions ---
+  const [rememberEmail, setRememberEmail] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
   const focusStyle =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-4 focus-visible:ring-offset-[#101A2C]";
 
   const inputStyle =
     "min-h-14 w-full rounded-xl border border-white/15 bg-[#080F1D] py-3.5 pl-12 pr-4 text-base text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 disabled:opacity-60";
+
+  // Auto-fill remembered email + auto-redirect if already logged in
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+
+    async function checkExistingSession() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          const { data: admin } = await supabase
+            .from("admins")
+            .select("*")
+            .eq("auth_user_id", session.user.id)
+            .single();
+
+          if (admin && admin.role === "admin") {
+            router.replace("/admin/dashboard");
+            return;
+          }
+        }
+      } catch {
+        // silently ignore — user will just see the login form
+      } finally {
+        setCheckingSession(false);
+      }
+    }
+
+    checkExistingSession();
+  }, [router]);
+
+  function handlePasswordKeyEvent(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (typeof event.getModifierState === "function") {
+      setCapsLockOn(event.getModifierState("CapsLock"));
+    }
+  }
 
   // Original Supabase Admin Login Logic
   async function login(event: FormEvent<HTMLFormElement>) {
@@ -98,6 +147,13 @@ export default function AdminLogin() {
         JSON.stringify(admin)
       );
 
+      // UI-only: remember email preference
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email.trim());
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+
       router.push("/admin/dashboard");
       navigating = true;
 
@@ -111,6 +167,14 @@ export default function AdminLogin() {
         setLoading(false);
       }
     }
+  }
+
+  if (checkingSession) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center bg-[#080D19]">
+        <LoaderCircle className="h-6 w-6 animate-spin text-blue-400" />
+      </main>
+    );
   }
 
   return (
@@ -181,7 +245,7 @@ export default function AdminLogin() {
           >
             স্মার্ট শিক্ষা
             <br />
-            ব্যবস্থাপনায়
+            ব্যবস্থাপনায়
 
             <span className="mt-2 block text-blue-400">
               স্বাগতম।
@@ -189,7 +253,7 @@ export default function AdminLogin() {
           </h2>
 
           <p className="mt-6 max-w-md text-base leading-8 text-slate-300">
-            The Curious Classroom-এর কেন্দ্রীয় অ্যাডমিন
+            The Curious Classroom-এর কেন্দ্রীয় অ্যাডমিন
             প্যানেলে স্বাগতম। শিক্ষার্থী, ভর্তি, পরীক্ষা
             এবং ফলাফল ব্যবস্থাপনা করুন একটি আধুনিক
             ও সুসংগঠিত প্ল্যাটফর্মে।
@@ -362,6 +426,8 @@ export default function AdminLogin() {
                         setPassword(event.target.value);
                         setError("");
                       }}
+                      onKeyDown={handlePasswordKeyEvent}
+                      onKeyUp={handlePasswordKeyEvent}
                       placeholder="তোমার Password"
                       className={`${inputStyle} pr-14`}
                     />
@@ -370,8 +436,8 @@ export default function AdminLogin() {
                       type="button"
                       aria-label={
                         showPassword
-                          ? "পাসওয়ার্ড লুকান"
-                          : "পাসওয়ার্ড দেখুন"
+                          ? "পাসওয়ার্ড লুকান"
+                          : "পাসওয়ার্ড দেখুন"
                       }
                       aria-controls="admin-password"
                       aria-pressed={showPassword}
@@ -390,7 +456,26 @@ export default function AdminLogin() {
                     </button>
 
                   </div>
+
+                  {/* Caps Lock Warning */}
+                  {capsLockOn && (
+                    <p className="mt-2 flex items-center gap-1.5 text-xs text-amber-300">
+                      <TriangleAlert size={13} />
+                      Caps Lock চালু আছে
+                    </p>
+                  )}
                 </div>
+
+                {/* Remember Email */}
+                <label className="flex items-center gap-2.5 text-sm text-slate-400 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberEmail}
+                    onChange={(e) => setRememberEmail(e.target.checked)}
+                    className="h-4 w-4 rounded border-white/20 bg-[#080F1D] text-blue-500 focus:ring-blue-400 focus:ring-offset-0"
+                  />
+                  Email মনে রাখুন
+                </label>
 
                 {/* Error Message */}
                 {error && (
